@@ -4,15 +4,15 @@ import { ReactNode } from "react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "FidelpeExtractX",
-    description: "Extract and simplify text from images or documents easily.",
+    title: "FidelpeExtractX - Simplifier les textes",
+    description: "Outil simple pour extraire et rendre les textes plus faciles à comprendre, conçu pour les personnes peu à l'aise avec le numérique.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
     return (
-        <html lang="en">
-        <body className="min-h-screen bg-gradient-menu">
-        <main className="max-w-3xl mx-auto py-20">{children}</main>
+        <html lang="fr">
+        <body className="app-container">
+            <main className="card">{children}</main>
         </body>
         </html>
     );

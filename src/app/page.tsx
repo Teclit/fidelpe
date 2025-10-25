@@ -50,7 +50,7 @@ export default function Home(): React.ReactElement {
     return (
         <main className="card">
             <header className="header">
-                <h1 className="font-waldba-gothic font-bold text-lg">ፊደልፐ ምስ ጽሑፋት</h1>
+                <h1 className="font-geez-gothic font-bold text-lg">ፊደልፐ ምስ ጽሑፋት</h1>
                 <h1>FidelpeExtractX — Rendre les textes faciles</h1>
                 <p className="lead">
                     Cet outil est pour les personnes qui n'utilisent pas souvent les outils numériques.

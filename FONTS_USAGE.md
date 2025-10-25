@@ -7,15 +7,15 @@ Toutes les polices du répertoire RaeyType sont maintenant disponibles séparém
 1. **Brana** - `--font-brana`
 2. **Geez Manuscript** - `--font-geez-manuscript`
 3. **GF Zemenu** - `--font-gfzemenu`
-4. **Waldba Fantuwua** - `--font-waldba-fantuwua`
-5. **Waldba Hiwua** - `--font-waldba-hiwua`
-6. **Waldba Jiret** - `--font-waldba-jiret`
-7. **Waldba Tint** - `--font-waldba-tint`
-8. **Waldba Wookianos** - `--font-waldba-wookianos`
-9. **Waldba Yebse** - `--font-waldba-yebse`
-10. **Waldba Goffer** - `--font-waldba-goffer`
-11. **Waldba Gothic** - `--font-waldba-gothic` (police par défaut)
-12. **Waldba Zelan** - `--font-waldba-zelan`
+4. **Geez Fantuwua** - `--font-geez-fantuwua`
+5. **Geez Hiwua** - `--font-geez-hiwua`
+6. **Geez Jiret** - `--font-geez-jiret`
+7. **Geez Tint** - `--font-geez-tint`
+8. **Geez Wookianos** - `--font-geez-wookianos`
+9. **Geez Yebse** - `--font-geez-yebse`
+10. **Geez Goffer** - `--font-geez-goffer`
+11. **Geez Gothic** - `--font-geez-gothic` (police par défaut)
+12. **Geez Zelan** - `--font-geez-zelan`
 
 ## Comment utiliser les polices
 
@@ -36,8 +36,8 @@ Dans votre fichier `globals.css` :
     font-family: var(--font-gfzemenu);
 }
 
-.font-waldba-fantuwua {
-    font-family: var(--font-waldba-fantuwua);
+.font-geez-fantuwua {
+    font-family: var(--font-geez-fantuwua);
 }
 
 /* etc. pour les autres polices */
@@ -55,7 +55,7 @@ Dans `page.tsx`, vous pouvez importer les polices depuis le layout :
 
 1. D'abord, exportez les polices dans `layout.tsx` :
 ```typescript
-export { brana, geezManuscript, waldbaGothic, /* etc */ }
+export { brana, geezManuscript, geezGothic, /* etc */ }
 ```
 
 2. Puis utilisez-les dans `page.tsx` :
@@ -76,5 +76,5 @@ import { brana, geezManuscript } from './layout';
 
 ## Police par défaut
 
-La police **Waldba Gothic** est appliquée par défaut à toute l'application via `className={waldbaGothic.className}` sur l'élément `<html>`.
+La police **Geez Gothic** est appliquée par défaut à toute l'application via `className={geezGothic.className}` sur l'élément `<html>`.
 

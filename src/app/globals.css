@@ -225,13 +225,13 @@ body {
 .font-brana { font-family: var(--font-brana); }
 .font-geez-manuscript { font-family: var(--font-geez-manuscript); }
 .font-gfzemenu { font-family: var(--font-gfzemenu); }
-.font-waldba-fantuwua { font-family: var(--font-waldba-fantuwua); }
-.font-waldba-hiwua { font-family: var(--font-waldba-hiwua); }
-.font-waldba-jiret { font-family: var(--font-waldba-jiret); }
-.font-waldba-tint { font-family: var(--font-waldba-tint); }
-.font-waldba-wookianos { font-family: var(--font-waldba-wookianos); }
-.font-waldba-yebse { font-family: var(--font-waldba-yebse); }
-.font-waldba-goffer { font-family: var(--font-waldba-goffer); }
-.font-waldba-gothic { font-family: var(--font-waldba-gothic); }
-.font-waldba-zelan { font-family: var(--font-waldba-zelan); }
+.font-geez-fantuwua { font-family: var(--font-geez-fantuwua); }
+.font-geez-hiwua { font-family: var(--font-geez-hiwua); }
+.font-geez-jiret { font-family: var(--font-geez-jiret); }
+.font-geez-tint { font-family: var(--font-geez-tint); }
+.font-geez-wookianos { font-family: var(--font-geez-wookianos); }
+.font-geez-yebse { font-family: var(--font-geez-yebse); }
+.font-geez-goffer { font-family: var(--font-geez-goffer); }
+.font-geez-gothic { font-family: var(--font-geez-gothic); }
+.font-geez-zelan { font-family: var(--font-geez-zelan); }
 

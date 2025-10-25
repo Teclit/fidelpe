@@ -24,58 +24,58 @@ const gfzemenu = localFont({
     variable: '--font-gfzemenu',
 });
 
-const waldbaFantuwua = localFont({
-    src: './fonts/RaeyType/WaldbaFantuwua-Regular.ttf',
+const geezFantuwua = localFont({
+    src: './fonts/RaeyType/GeezFantuwua-Regular.ttf',
     display: 'swap',
-    variable: '--font-waldba-fantuwua',
+    variable: '--font-geez-fantuwua',
 });
 
-const waldbaHiwua = localFont({
-    src: './fonts/RaeyType/WaldbaHiwua-Regular.ttf',
+const geezHiwua = localFont({
+    src: './fonts/RaeyType/GeezHiwua-Regular.ttf',
     display: 'swap',
-    variable: '--font-waldba-hiwua',
+    variable: '--font-geez-hiwua',
 });
 
-const waldbaJiret = localFont({
-    src: './fonts/RaeyType/WaldbaJiret-Regular.ttf',
+const geezJiret = localFont({
+    src: './fonts/RaeyType/GeezJiret-Regular.ttf',
     display: 'swap',
-    variable: '--font-waldba-jiret',
+    variable: '--font-geez-jiret',
 });
 
-const waldbaTint = localFont({
-    src: './fonts/RaeyType/WaldbaTint-Regular.ttf',
+const geezTint = localFont({
+    src: './fonts/RaeyType/GeezTint-Regular.ttf',
     display: 'swap',
-    variable: '--font-waldba-tint',
+    variable: '--font-geez-tint',
 });
 
-const waldbaWookianos = localFont({
-    src: './fonts/RaeyType/WaldbaWookianos-Regular.ttf',
+const geezWookianos = localFont({
+    src: './fonts/RaeyType/GeezWookianos-Regular.ttf',
     display: 'swap',
-    variable: '--font-waldba-wookianos',
+    variable: '--font-geez-wookianos',
 });
 
-const waldbaYebse = localFont({
-    src: './fonts/RaeyType/WaldbaYebse-Regular.ttf',
+const geezYebse = localFont({
+    src: './fonts/RaeyType/GeezYebse-Regular.ttf',
     display: 'swap',
-    variable: '--font-waldba-yebse',
+    variable: '--font-geez-yebse',
 });
 
-const waldbaGoffer = localFont({
-    src: './fonts/RaeyType/WaldbaYigezuBisratGoffer-Regular.ttf',
+const geezGoffer = localFont({
+    src: './fonts/RaeyType/GeezYigezuBisratGoffer-Regular.ttf',
     display: 'swap',
-    variable: '--font-waldba-goffer',
+    variable: '--font-geez-goffer',
 });
 
-const waldbaGothic = localFont({
-    src: './fonts/RaeyType/WaldbaYigezuBisratGothic-Regular.ttf',
+const geezGothic = localFont({
+    src: './fonts/RaeyType/GeezYigezuBisratGothic-Regular.ttf',
     display: 'swap',
-    variable: '--font-waldba-gothic',
+    variable: '--font-geez-gothic',
 });
 
-const waldbaZelan = localFont({
-    src: './fonts/RaeyType/WaldbaZelan-Regular.ttf',
+const geezZelan = localFont({
+    src: './fonts/RaeyType/GeezZelan-Regular.ttf',
     display: 'swap',
-    variable: '--font-waldba-zelan',
+    variable: '--font-geez-zelan',
 });
 
 // Exporter les polices pour utilisation dans d'autres composants
@@ -83,15 +83,15 @@ export {
     brana,
     geezManuscript,
     gfzemenu,
-    waldbaFantuwua,
-    waldbaHiwua,
-    waldbaJiret,
-    waldbaTint,
-    waldbaWookianos,
-    waldbaYebse,
-    waldbaGoffer,
-    waldbaGothic,
-    waldbaZelan
+    geezFantuwua,
+    geezHiwua,
+    geezJiret,
+    geezTint,
+    geezWookianos,
+    geezYebse,
+    geezGoffer,
+    geezGothic,
+    geezZelan
 };
 
 
@@ -102,7 +102,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({children}: { children: ReactNode }) {
     return (
-        <html lang="en" className={`${waldbaGothic.variable} ${brana.variable} ${geezManuscript.variable} ${gfzemenu.variable} ${waldbaFantuwua.variable} ${waldbaHiwua.variable} ${waldbaJiret.variable} ${waldbaTint.variable} ${waldbaWookianos.variable} ${waldbaYebse.variable} ${waldbaGoffer.variable} ${waldbaZelan.variable} ${waldbaGothic.className}`}>
+        <html lang="en" className={`${geezGothic.variable} ${brana.variable} ${geezManuscript.variable} ${gfzemenu.variable} ${geezFantuwua.variable} ${geezHiwua.variable} ${geezJiret.variable} ${geezTint.variable} ${geezWookianos.variable} ${geezYebse.variable} ${geezGoffer.variable} ${geezZelan.variable} ${geezGothic.className}`}>
         <body className="app-container">
         <main className="card">{children}</main>
         </body>

@@ -195,13 +195,16 @@ jobs:
         id: deploy
         shell: bash
         run: |
-          set -euo pipefail
+          set -eo pipefail
+          echo "GITHUB_REF=$GITHUB_REF"
+          : "${VERCEL_TOKEN:?VERCEL_TOKEN is required}"
           PROD_FLAG=""
           if [[ "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_REF" == "refs/heads/master" || "$GITHUB_REF" == refs/tags/* ]]; then
             PROD_FLAG="--prod"
           fi
+          echo "Using PROD_FLAG='$PROD_FLAG'"
           # Deploy prebuilt output and capture the URL from CLI output
-          OUTPUT=$(npx vercel@latest deploy --prebuilt --token="$VERCEL_TOKEN" --yes $PROD_FLAG 2>&1 | tee /tmp/vercel_deploy.log)
+          npx vercel@latest deploy --prebuilt --token="$VERCEL_TOKEN" --yes $PROD_FLAG 2>&1 | tee /tmp/vercel_deploy.log
           URL=$(grep -Eo 'https://[a-zA-Z0-9.-]+\.vercel\.app' /tmp/vercel_deploy.log | tail -n1 || true)
           echo "deployment-url=$URL" >> "$GITHUB_OUTPUT"
 

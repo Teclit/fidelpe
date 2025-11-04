@@ -3,6 +3,7 @@ import "./globals.css";
 import {ReactNode} from "react";
 import type {Metadata} from "next";
 import localFont from 'next/font/local';
+import Sidebar from "@/components/Sidebar";
 
 
 // Polices individuelles pour utilisation séparée
@@ -101,11 +102,18 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({children}: { children: ReactNode }) {
-    return (
-        <html lang="en" className={`${geezGothic.variable} ${brana.variable} ${geezManuscript.variable} ${gfzemenu.variable} ${geezFantuwua.variable} ${geezHiwua.variable} ${geezJiret.variable} ${geezTint.variable} ${geezWookianos.variable} ${geezYebse.variable} ${geezGoffer.variable} ${geezZelan.variable} ${geezGothic.className}`}>
-        <body className="w-full min-h-screen flex items-center justify-center px-4 py-10 bg-gradient-to-br from-gray-900 to-gray-800">
-        <main className="w-full max-w-[820px] bg-white/98 rounded-2xl p-6 shadow-[0_12px_36px_rgba(20,20,20,0.12)] border border-gray-200">{children}</main>
-        </body>
-        </html>
-    );
+        return (
+                <html lang="en" className={`${geezGothic.variable} ${brana.variable} ${geezManuscript.variable} ${gfzemenu.variable} ${geezFantuwua.variable} ${geezHiwua.variable} ${geezJiret.variable} ${geezTint.variable} ${geezWookianos.variable} ${geezYebse.variable} ${geezGoffer.variable} ${geezZelan.variable} ${geezGothic.className}`}>
+                <body className="w-full min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
+                    <div className="flex min-h-screen w-full backdrop-blur-sm/0">
+                        <Sidebar />
+                        <section className="basis-[80%] min-h-screen p-6">
+                            <div className="w-full h-full rounded-2xl p-6 ">
+                                {children}
+                            </div>
+                        </section>
+                    </div>
+                </body>
+                </html>
+        );
 }

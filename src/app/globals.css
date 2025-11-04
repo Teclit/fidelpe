@@ -47,28 +47,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* App container (centers content, responsive) */
-.app-container {
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2.5rem 1rem;
-    background-image: var(--color-gradient-menu-dark);
-}
-
-/* Card / white panel */
-.card {
-    width: 100%;
-    max-width: 820px; /* plus large pour respirer */
-    background: rgba(255,255,255,0.98);
-    border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: 0 12px 36px rgba(20,20,20,0.12);
-    border: 1px solid var(--card-border);
-}
-
 /* Header and lead text */
 .header {
     text-align: center;

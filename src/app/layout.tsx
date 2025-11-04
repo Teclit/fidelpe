@@ -108,8 +108,8 @@ export default function RootLayout({children}: { children: ReactNode }) {
                 <body className="w-full min-h-screen bg-gradient-to-br from-gray-900 to-gray-800">
                     <div className="flex min-h-screen w-full backdrop-blur-sm/0">
                         <Sidebar />
-                        <section className="basis-[80%] min-h-screen p-6">
-                            <div className="w-full h-full rounded-2xl p-6 ">
+                        <section className="flex-1 md:basis-[80%] min-h-screen p-3 sm:p-4 md:p-6">
+                            <div className="w-full h-full rounded-2xl p-3 sm:p-4 md:p-6 ">
                                 {children}
                             </div>
                         </section>

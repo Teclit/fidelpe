@@ -48,11 +48,11 @@ export default function Home(): React.ReactElement {
     }, [result]);
 
     return (
-        <main className="card">
-            <header className="header">
-                <h1 className="font-geez-gothic font-bold text-lg">ፊደልፐ ምስ ጽሑፋት</h1>
-                <h1>FidelpeExtractX — Rendre les textes faciles</h1>
-                <p className="lead">
+        <main className="space-y-4">
+            <header className="text-center mb-3">
+                <h1 className="font-geez-gothic font-bold text-[1.75rem] leading-[1.15] text-[var(--color-primary)] mb-2">ፊደልፐ ምስ ጽሑፋት</h1>
+                <h1 className="text-[1.75rem] leading-[1.15] text-[var(--color-primary)] mb-2">FidelpeExtractX — Rendre les textes faciles</h1>
+                <p className="m-0 text-[var(--color-text-muted)] text-[1.05rem] leading-[1.45]">
                     Cet outil est pour les personnes qui n&rsquo;utilisent pas souvent les outils numériques.
                     Copiez un texte ou importez une photo (facture, lettre, note). Nous extrayons
                     et simplifions les phrases pour que ce soit plus clair.
@@ -60,27 +60,35 @@ export default function Home(): React.ReactElement {
             </header>
 
             <form onSubmit={handleProcess} className="">
-                <label htmlFor="text" className="label">Votre texte ou image</label>
+                <label htmlFor="text" className="block font-bold text-[var(--color-primary)] mb-[0.6rem] text-[0.98rem]">Votre texte ou image</label>
 
                 <textarea
                     id="text"
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     placeholder="Collez le texte ici ou importez une photo/scan."
-                    className="textarea"
+                    className="w-full min-h-[14rem] p-[0.9rem] rounded-[12px] border border-[rgba(54,41,37,0.12)] bg-white text-[var(--color-text-dark)] resize-y shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] text-base focus:outline focus:outline-[3px] focus:outline-[rgba(133,88,50,0.12)] focus:border-[var(--color-accent-cta)]"
                 />
 
-                <div style={{display: 'flex', justifyContent: 'space-between', gap: 12, marginTop: 12}}>
-                    <label className="file-label">
-                        <input type="file" accept="image/*" onChange={handleFileChange} />
+                <div className="flex justify-between gap-3 mt-3">
+                    <label className="inline-flex gap-2 items-center py-[0.6rem] px-[0.9rem] bg-[var(--color-secondary)] border border-[rgba(0,0,0,0.06)] rounded-[12px] cursor-pointer text-[#111827] text-[0.98rem]">
+                        <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
                         📁 Importer une photo / un scan
                     </label>
 
-                    <div style={{display: 'flex', gap: 8}}>
-                        <button type="submit" disabled={loading} className={`btn btn-primary`}>
+                    <div className="flex gap-2">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="inline-flex items-center gap-[0.6rem] py-3 px-4 rounded-[12px] font-bold cursor-pointer border-0 text-[0.98rem] bg-gradient-to-b from-[var(--color-accent-cta)] to-[var(--color-accent)] text-white shadow-[0_8px_22px_rgba(133,88,50,0.12)] focus:outline focus:outline-[3px] focus:outline-[rgba(133,88,50,0.14)] disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
                             {loading ? 'Traitement...' : 'Simplifier'}
                         </button>
-                        <button type="button" onClick={handleReset} className="btn btn-secondary">
+                        <button
+                            type="button"
+                            onClick={handleReset}
+                            className="inline-flex items-center gap-[0.6rem] py-3 px-4 rounded-[12px] font-bold cursor-pointer text-[0.98rem] bg-white text-[var(--color-primary)] border border-[rgba(17,24,39,0.06)] disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
                             Réinitialiser
                         </button>
                     </div>
@@ -88,10 +96,14 @@ export default function Home(): React.ReactElement {
             </form>
 
             {result && (
-                <section className="result">
-                    <div className="result-header">
-                        <h2 className="text-primary">Texte simplifié</h2>
-                        <button onClick={handleCopy} className={`copy-btn ${copied ? 'copied' : ''}`} aria-label={copied ? 'Copié' : 'Copier'}>
+                <section className="mt-5">
+                    <div className="flex items-center justify-between mb-2">
+                        <h2 className="text-[var(--color-primary)]">Texte simplifié</h2>
+                        <button
+                            onClick={handleCopy}
+                            className={`inline-flex items-center gap-2 py-2 px-3 rounded-[10px] font-bold text-white ${copied ? 'bg-[var(--color-primary-two)]' : 'bg-[var(--color-accent)]'}`}
+                            aria-label={copied ? 'Copié' : 'Copier'}
+                        >
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
                                 <rect x="9" y="9" width="11" height="11" rx="2" />
                                 <path d="M5 15V5a2 2 0 0 1 2-2h10" />
@@ -100,11 +112,11 @@ export default function Home(): React.ReactElement {
                         </button>
                     </div>
 
-                    <pre className="custom-scrollbar">{result}</pre>
+                    <pre className="whitespace-pre-wrap bg-[#fff8f3] p-4 rounded-[10px] border border-[rgba(17,24,39,0.06)] text-[var(--color-text-dark)] max-h-[50vh] overflow-auto text-base leading-6">{result}</pre>
                 </section>
             )}
 
-            <footer className="app-footer">© {new Date().getFullYear()} FidelpeExtractX — Pour les personnes peu à l&rsquo;aise avec le numérique.</footer>
+            <footer className="text-center text-[var(--color-text-muted)] text-[0.95rem] mt-4">© {new Date().getFullYear()} FidelpeExtractX — Pour les personnes peu à l&rsquo;aise avec le numérique.</footer>
         </main>
     );
 }

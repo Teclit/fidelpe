@@ -31,16 +31,145 @@ const DEFAULT_PERSO: Personalization = {
 
 const STORAGE_KEY_CONTENT = "editor.document.html";
 const STORAGE_KEY_PERSO = "editor.perso";
+// Legacy default template we used previously; treat it as empty to avoid exporting it
+const DEFAULT_TEMPLATE_HTML = "<h2>Welcome</h2><p>Start typing your document here…</p>";
 
 const FONT_OPTIONS: Array<{ label: string; varName: string }> = [
+  // RaeyType (from layout.tsx)
+  { label: "Brana (RaeyType)", varName: "--font-brana" },
+  { label: "Geez Manuscript (RaeyType)", varName: "--font-geez-manuscript" },
+  { label: "GF Zemen U (RaeyType)", varName: "--font-gfzemenu" },
+  { label: "Geez Fantuwua (RaeyType)", varName: "--font-geez-fantuwua" },
+  { label: "Geez Hiwua (RaeyType)", varName: "--font-geez-hiwua" },
+  { label: "Geez Jiret (RaeyType)", varName: "--font-geez-jiret" },
+  { label: "Geez Tint (RaeyType)", varName: "--font-geez-tint" },
+  { label: "Geez Wookianos (RaeyType)", varName: "--font-geez-wookianos" },
+  { label: "Geez Yebse (RaeyType)", varName: "--font-geez-yebse" },
+  { label: "Geez Goffer (RaeyType)", varName: "--font-geez-goffer" },
+  { label: "Geez Gothic (RaeyType)", varName: "--font-geez-gothic" },
+  { label: "Geez Zelan (RaeyType)", varName: "--font-geez-zelan" },
+
+  // Google
   { label: "Menbere (Google)", varName: "--font-menbere" },
+  { label: "Agbalumo (Google)", varName: "--font-agbalumo" },
+
+  // Noto
   { label: "Noto Sans Ethiopic", varName: "--font-noto-sans-ethiopic" },
   { label: "Noto Serif Ethiopic", varName: "--font-noto-serif-ethiopic" },
+
+  // SIL
   { label: "Abyssinica SIL", varName: "--font-abyssinica-sil" },
-  { label: "Brana (RaeyType)", varName: "--font-brana" },
-  { label: "Geez Gothic (RaeyType)", varName: "--font-geez-gothic" },
-  { label: "Addis Sans (Zamran)", varName: "--font-addis-sans" },
+  { label: "Abyssinica SIL Connected", varName: "--font-abyssinica-sil-connected" },
+
+  // Wazéma
+  { label: "Addis Abeba Unicode (Wazéma)", varName: "--font-addis-abeba-unicode" },
+  { label: "Desta Unicode (Wazéma)", varName: "--font-desta-unicode" },
+  { label: "Tesfa Unicode (Wazéma)", varName: "--font-tesfa-unicode" },
+
+  // SurGraphics
+  { label: "SurGraphics", varName: "--font-surgraphics" },
+
+  // TypeHabesha
+  { label: "Loga (TypeHabesha)", varName: "--font-loga" },
+  { label: "Loga Display (TypeHabesha)", varName: "--font-loga-display" },
+  { label: "Habesha Serif Distort (TypeHabesha)", varName: "--font-habesha-serif-distort" },
+  { label: "Zibriqriq (TypeHabesha)", varName: "--font-zibriqriq" },
+
+  // AnbassaDesign
+  { label: "Adwa (AnbassaDesign)", varName: "--font-adwa" },
+  { label: "Adwa Sans Serif (AnbassaDesign)", varName: "--font-adwa-sans-serif" },
+  { label: "Entoto (AnbassaDesign)", varName: "--font-entoto" },
+  { label: "Godana (AnbassaDesign)", varName: "--font-godana" },
+  { label: "Meaza (AnbassaDesign)", varName: "--font-meaza" },
+  { label: "Neteru (AnbassaDesign)", varName: "--font-neteru" },
+  { label: "Shiromeda (AnbassaDesign)", varName: "--font-shiromeda" },
+  { label: "Shiromeda Serif (AnbassaDesign)", varName: "--font-shiromeda-serif" },
+  { label: "Tayitu (AnbassaDesign)", varName: "--font-tayitu" },
+
+  // HaaHu
+  { label: "ETH Gofa (HaaHu)", varName: "--font-eth-gofa" },
+
+  // HalwoteHareg
+  { label: "HH Lemd Mono (HalwoteHareg)", varName: "--font-hh-lemd-mono" },
+
+  // Qedron
+  { label: "Kiros (Qedron)", varName: "--font-kiros" },
+
+  // GeezFonts
+  { label: "Geez Pixels 2 (GeezFonts)", varName: "--font-geez-pixels-2" },
+  { label: "Geez Digital V1 (GeezFonts)", varName: "--font-geez-digital-v1" },
+
+  // RoadToEthiopia
+  { label: "Addis (RoadToEthiopia)", varName: "--font-addis" },
+  { label: "Dire Dawa (RoadToEthiopia)", varName: "--font-dire-dawa" },
+
+  // EducationalFonts
+  { label: "Geez Handwriting (EducationalFonts)", varName: "--font-geez-handwriting" },
+
+  // BlackFoundry
+  { label: "Abba Garima (BlackFoundry)", varName: "--font-abba-garima" },
+
+  // Fixedsys
+  { label: "Fixedsys", varName: "--font-fixedsys" },
+
+  // TITUS
+  { label: "TITUS Cyberbit Basic", varName: "--font-titus-cyberbit-basic" },
+
+  // YonathanSeyoum
+  { label: "Habesha Typewriter (YonathanSeyoum)", varName: "--font-habesha-typewriter" },
+  { label: "Habesha Stencil (YonathanSeyoum)", varName: "--font-habesha-stencil" },
+  { label: "Habesha Pixels (YonathanSeyoum)", varName: "--font-habesha-pixels" },
+  { label: "Habesha Blocks (YonathanSeyoum)", varName: "--font-habesha-blocks" },
+
+  // ZamranStudio
+  { label: "Addis Sans (ZamranStudio)", varName: "--font-addis-sans" },
+  { label: "Jegena Zamaric (ZamranStudio)", varName: "--font-jegena-zamaric" },
+  { label: "Jegena Title Zamaric (ZamranStudio)", varName: "--font-jegena-title-zamaric" },
+  { label: "Zamaric (ZamranStudio)", varName: "--font-zamaric" },
+
+  // AdilCreative
+  { label: "Adil (AdilCreative)", varName: "--font-adil" },
+  { label: "Selam (AdilCreative)", varName: "--font-selam" },
+
+  // DotBoxDesignStudio
+  { label: "Ketefa (DotBox)", varName: "--font-ketefa" },
+  { label: "Semayawi (DotBox)", varName: "--font-semayawi" },
+
+  // MetaAppz
+  { label: "Chiret (MetaAppz)", varName: "--font-chiret" },
+  { label: "Seat (MetaAppz)", varName: "--font-seat" },
+  { label: "Tera (MetaAppz)", varName: "--font-tera" },
+
+  // Mulat
+  { label: "Mulat Abay", varName: "--font-mulat-abay" },
+  { label: "Mulat Addis", varName: "--font-mulat-addis" },
+  { label: "Mulat Ahmed", varName: "--font-mulat-ahmed" },
+  { label: "Mulat Asmara", varName: "--font-mulat-asmara" },
+  { label: "Mulat Awash", varName: "--font-mulat-awash" },
+
+  // GNU
+  { label: "FreeSerif (GNU)", varName: "--font-free-serif" },
+
+  // Senamirmir
+  { label: "Ethiopic Abay (Senamirmir)", varName: "--font-ethiopic-abay" },
+  { label: "Ethiopic Lessan (Senamirmir)", varName: "--font-ethiopic-lessan" },
+  { label: "Ethiopic Le Tewahedo (Senamirmir)", varName: "--font-ethiopic-le-tewahedo" },
+  { label: "Ethiopic Sadiss (Senamirmir)", varName: "--font-ethiopic-sadiss" },
 ];
+
+// Font size controls
+const MIN_FONT_SIZE = 8;
+const MAX_FONT_SIZE = 300; // practical upper bound; browsers can render larger but this keeps UI sane
+const SIZE_PRESETS: number[] = [
+  12, 14, 16, 18, 20, 24, 28, 32, 36, 48, 60, 72, 96, 120, 144, 192, 240, 300,
+];
+const clampSize = (val: number) => Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, val));
+
+// Line-height controls
+const MIN_LINE = 0.8;
+const MAX_LINE = 10;
+const LINE_PRESETS: number[] = [1.0, 1.2, 1.4, 1.6, 2, 2.5, 3, 4, 5, 6, 8, 10];
+const clampLine = (val: number) => Math.max(MIN_LINE, Math.min(MAX_LINE, val));
 
 function ToolbarButton({
   onClick,
@@ -83,7 +212,11 @@ export default function RichTextEditor(): React.ReactElement {
 
   const initialContent = useMemo(() => {
     if (typeof window === "undefined") return "";
-    return localStorage.getItem(STORAGE_KEY_CONTENT) || "<h2>Welcome</h2><p>Start typing your document here…</p>";
+    const stored = localStorage.getItem(STORAGE_KEY_CONTENT);
+    if (!stored) return "";
+    // If stored value equals the old default template, ignore it
+    if (stored.trim() === DEFAULT_TEMPLATE_HTML) return "";
+    return stored;
   }, []);
 
   const editor = useEditor({
@@ -137,6 +270,11 @@ export default function RichTextEditor(): React.ReactElement {
   const wrapperMaxW = perso.pageWidth === "narrow" ? "max-w-2xl" : perso.pageWidth === "wide" ? "max-w-6xl" : "max-w-4xl";
 
   const exportHTML = () => {
+    const textCheck = (editor?.getText() ?? "").trim();
+    if (!textCheck) {
+      alert("Nothing to export yet. Type something first.");
+      return;
+    }
     const html = editor?.getHTML() ?? "";
     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
     const a = document.createElement("a");
@@ -147,7 +285,11 @@ export default function RichTextEditor(): React.ReactElement {
   };
 
   const exportText = () => {
-    const text = editor?.getText() ?? "";
+    const text = (editor?.getText() ?? "").trim();
+    if (!text) {
+      alert("Nothing to export yet. Type something first.");
+      return;
+    }
     const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -273,19 +415,98 @@ export default function RichTextEditor(): React.ReactElement {
           <label className="text-xs mr-2">Size</label>
           <input
             type="number"
-            className="w-16 mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
+            min={MIN_FONT_SIZE}
+            max={MAX_FONT_SIZE}
+            step={1}
+            className="w-20 mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
             value={perso.fontSize}
-            onChange={(e) => setPerso((p) => ({ ...p, fontSize: Math.max(10, Math.min(72, Number(e.target.value) || 16)) }))}
+            onChange={(e) => setPerso((p) => ({ ...p, fontSize: clampSize(Number(e.target.value) || 16) }))}
+            aria-label="Font size (px)"
           />
+          <button
+            type="button"
+            className="px-2 py-1 mr-1 rounded-md border border-gray-300 bg-white text-sm"
+            onClick={() => setPerso((p) => ({ ...p, fontSize: clampSize(p.fontSize - 2) }))}
+            title="Decrease font size"
+          >A-</button>
+          <button
+            type="button"
+            className="px-2 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
+            onClick={() => setPerso((p) => ({ ...p, fontSize: clampSize(p.fontSize + 2) }))}
+            title="Increase font size"
+          >A+</button>
+          <input
+            type="range"
+            min={MIN_FONT_SIZE}
+            max={MAX_FONT_SIZE}
+            step={1}
+            value={perso.fontSize}
+            onChange={(e) => setPerso((p) => ({ ...p, fontSize: clampSize(Number(e.target.value) || p.fontSize) }))}
+            className="w-40 h-2 mr-2 mb-1 cursor-pointer"
+            aria-label="Font size slider"
+          />
+          <select
+            className="mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
+            value={SIZE_PRESETS.includes(perso.fontSize) ? String(perso.fontSize) : ''}
+            onChange={(e) => {
+              const v = Number(e.target.value);
+              if (!isNaN(v)) setPerso((p) => ({ ...p, fontSize: clampSize(v) }));
+            }}
+            aria-label="Font size presets"
+          >
+            <option value="" disabled>Preset</option>
+            {SIZE_PRESETS.map((s) => (
+              <option key={s} value={String(s)}>{s}px</option>
+            ))}
+          </select>
 
           <label className="text-xs mr-2">Line</label>
           <input
             type="number"
-            step="0.1"
-            className="w-16 mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
+            min={MIN_LINE}
+            max={MAX_LINE}
+            step={0.1}
+            className="w-20 mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
             value={perso.lineHeight}
-            onChange={(e) => setPerso((p) => ({ ...p, lineHeight: Math.max(1, Math.min(3, Number(e.target.value) || 1.6)) }))}
+            onChange={(e) => setPerso((p) => ({ ...p, lineHeight: clampLine(Number(e.target.value) || p.lineHeight) }))}
+            aria-label="Line height"
           />
+          <button
+            type="button"
+            className="px-2 py-1 mr-1 rounded-md border border-gray-300 bg-white text-sm"
+            onClick={() => setPerso((p) => ({ ...p, lineHeight: clampLine(parseFloat((p.lineHeight - 0.1).toFixed(2))) }))}
+            title="Decrease line height"
+          >−</button>
+          <button
+            type="button"
+            className="px-2 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
+            onClick={() => setPerso((p) => ({ ...p, lineHeight: clampLine(parseFloat((p.lineHeight + 0.1).toFixed(2))) }))}
+            title="Increase line height"
+          >+</button>
+          <input
+            type="range"
+            min={MIN_LINE}
+            max={MAX_LINE}
+            step={0.1}
+            value={perso.lineHeight}
+            onChange={(e) => setPerso((p) => ({ ...p, lineHeight: clampLine(Number(e.target.value) || p.lineHeight) }))}
+            className="w-40 h-2 mr-2 mb-1 cursor-pointer"
+            aria-label="Line height slider"
+          />
+          <select
+            className="mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
+            value={LINE_PRESETS.includes(Number(perso.lineHeight.toFixed(1))) ? String(Number(perso.lineHeight.toFixed(1))) : ''}
+            onChange={(e) => {
+              const v = Number(e.target.value);
+              if (!isNaN(v)) setPerso((p) => ({ ...p, lineHeight: clampLine(v) }));
+            }}
+            aria-label="Line height presets"
+          >
+            <option value="" disabled>Preset</option>
+            {LINE_PRESETS.map((lh) => (
+              <option key={lh} value={String(lh)}>{lh}</option>
+            ))}
+          </select>
 
           <label className="text-xs mr-2">Width</label>
           <select

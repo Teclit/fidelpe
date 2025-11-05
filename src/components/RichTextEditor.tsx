@@ -85,6 +85,8 @@ export default function RichTextEditor(): React.ReactElement {
   }, []);
 
   const editor = useEditor({
+    // Prevent SSR hydration mismatches per TipTap guidance
+    immediatelyRender: false,
     extensions: [
   Color.configure({ types: ["textStyle"] }),
   TextStyle,

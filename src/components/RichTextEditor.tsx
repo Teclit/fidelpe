@@ -19,6 +19,9 @@ type Personalization = {
   fontSize: number; // px
   lineHeight: number; // unitless
   pageWidth: "narrow" | "normal" | "wide";
+  pageSize: "A4" | "Letter";
+  orientation: "portrait" | "landscape";
+  printMargin: "small" | "normal" | "large";
 };
 
 const DEFAULT_PERSO: Personalization = {
@@ -27,12 +30,18 @@ const DEFAULT_PERSO: Personalization = {
   fontSize: 18,
   lineHeight: 1.6,
   pageWidth: "normal",
+  pageSize: "A4",
+  orientation: "portrait",
+  printMargin: "normal",
 };
 
 const STORAGE_KEY_CONTENT = "editor.document.html";
 const STORAGE_KEY_PERSO = "editor.perso";
 // Legacy default template we used previously; treat it as empty to avoid exporting it
 const DEFAULT_TEMPLATE_HTML = "<h2>Welcome</h2><p>Start typing your document here…</p>";
+
+// Keep content rendering consistent between on-screen, export, and print
+const CONTENT_CLASSES = "max-w-none focus:outline-none min-h-[50vh] [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_p]:my-2 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:ml-6 [&_ol]:ml-6";
 
 const FONT_OPTIONS: Array<{ label: string; varName: string }> = [
   // RaeyType (from layout.tsx)
@@ -209,6 +218,7 @@ export default function RichTextEditor(): React.ReactElement {
       return DEFAULT_PERSO;
     }
   });
+  const [savedAt, setSavedAt] = useState<number | null>(null);
 
   const initialContent = useMemo(() => {
     if (typeof window === "undefined") return "";
@@ -218,6 +228,18 @@ export default function RichTextEditor(): React.ReactElement {
     if (stored.trim() === DEFAULT_TEMPLATE_HTML) return "";
     return stored;
   }, []);
+
+  const getSavedHtml = useCallback((): string => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_CONTENT) || "";
+      if (stored.trim() === DEFAULT_TEMPLATE_HTML) return "";
+      return stored;
+    } catch {
+      return "";
+    }
+  }, []);
+
+  
 
   const editor = useEditor({
     // Prevent SSR hydration mismatches per TipTap guidance
@@ -246,10 +268,32 @@ export default function RichTextEditor(): React.ReactElement {
     },
     editorProps: {
       attributes: {
-        class: "max-w-none focus:outline-none min-h-[50vh] [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_p]:my-2 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:ml-6 [&_ol]:ml-6",
+        class: CONTENT_CLASSES,
       },
     },
   });
+
+  const saveDocument = useCallback(() => {
+    const html = editor?.getHTML() ?? "";
+    try {
+      localStorage.setItem(STORAGE_KEY_CONTENT, html);
+      setSavedAt(Date.now());
+    } catch (e) {
+      console.error("Save failed", e);
+      alert("Save failed. Check storage permissions and retry.");
+    }
+  }, [editor]);
+
+  // Prefer current editor content when exporting/printing; fall back to saved
+  const getHtmlForExport = useCallback((): string => {
+    const htmlNow = editor?.getHTML() ?? "";
+    // Determine if current content has any visible text
+    const tmp = document.createElement("div");
+    tmp.innerHTML = htmlNow;
+    const textNow = (tmp.textContent || "").trim();
+    if (textNow.length > 0) return htmlNow;
+    return getSavedHtml();
+  }, [editor, getSavedHtml]);
 
   useEffect(() => {
     try {
@@ -270,12 +314,13 @@ export default function RichTextEditor(): React.ReactElement {
   const wrapperMaxW = perso.pageWidth === "narrow" ? "max-w-2xl" : perso.pageWidth === "wide" ? "max-w-6xl" : "max-w-4xl";
 
   const exportHTML = () => {
-    const textCheck = (editor?.getText() ?? "").trim();
-    if (!textCheck) {
-      alert("Nothing to export yet. Type something first.");
+    // Keep saved copy in sync, but export uses current content if present
+    saveDocument();
+    const html = getHtmlForExport();
+    if (!html.trim()) {
+      alert("Nothing to export.");
       return;
     }
-    const html = editor?.getHTML() ?? "";
     const blob = new Blob([html], { type: "text/html;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -285,9 +330,14 @@ export default function RichTextEditor(): React.ReactElement {
   };
 
   const exportText = () => {
-    const text = (editor?.getText() ?? "").trim();
+    // Keep saved copy in sync, but export uses current content if present
+    saveDocument();
+    const tmpHtml = getHtmlForExport();
+    const tempEl = document.createElement("div");
+    tempEl.innerHTML = tmpHtml;
+    const text = tempEl.textContent?.trim() || "";
     if (!text) {
-      alert("Nothing to export yet. Type something first.");
+      alert("Nothing to export.");
       return;
     }
     const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
@@ -298,9 +348,31 @@ export default function RichTextEditor(): React.ReactElement {
     URL.revokeObjectURL(a.href);
   };
 
+  const buildOffscreenNodeFromSaved = (savedHtml: string): HTMLDivElement => {
+    const node = document.createElement("div");
+    node.className = `${CONTENT_CLASSES} ${themeClasses} p-4 sm:p-6`;
+    node.style.fontFamily = `var(${perso.fontVar})`;
+    node.style.fontSize = `${perso.fontSize}px`;
+    node.style.lineHeight = String(perso.lineHeight);
+    node.style.position = "fixed";
+    node.style.left = "-99999px";
+    node.style.top = "-99999px";
+    node.style.pointerEvents = "none";
+    node.style.width = captureRef.current ? `${captureRef.current.clientWidth}px` : "auto";
+    node.innerHTML = savedHtml;
+    document.body.appendChild(node);
+    return node;
+  };
+
   const exportPng = async () => {
-    const node = captureRef.current;
-    if (!node) return;
+    // Keep saved copy in sync, but export uses current content if present
+    saveDocument();
+    const html = getHtmlForExport();
+    if (!html.trim()) {
+      alert("Nothing to export.");
+      return;
+    }
+    const node = buildOffscreenNodeFromSaved(html);
     const bg = perso.theme === "dark" ? "#111827" : "#ffffff";
     // Resolve CSS variable to an actual font-family stack string for capture
     const root = document.documentElement;
@@ -327,15 +399,23 @@ export default function RichTextEditor(): React.ReactElement {
       a.href = dataUrl;
       a.download = "document.png";
       a.click();
+      node.remove();
     } catch (err) {
       console.error("Export PNG failed", err);
       alert("Export PNG failed. Try changing font or theme, then retry.");
+      node.remove();
     }
   };
 
   const exportJpeg = async () => {
-    const node = captureRef.current;
-    if (!node) return;
+    // Keep saved copy in sync, but export uses current content if present
+    saveDocument();
+    const html = getHtmlForExport();
+    if (!html.trim()) {
+      alert("Nothing to export.");
+      return;
+    }
+    const node = buildOffscreenNodeFromSaved(html);
     const bg = perso.theme === "dark" ? "#111827" : "#ffffff";
     const root = document.documentElement;
     const varValue = getComputedStyle(root).getPropertyValue(perso.fontVar)?.trim();
@@ -360,11 +440,87 @@ export default function RichTextEditor(): React.ReactElement {
       a.href = dataUrl;
       a.download = "document.jpg";
       a.click();
+      node.remove();
     } catch (err) {
       console.error("Export JPG failed", err);
       alert("Export JPG failed. Try changing font or theme, then retry.");
+      // ensure cleanup
+      if (document.body.contains(node)) {
+        node.remove();
+      }
     }
   };
+
+  const printSaved = async () => {
+    // Keep saved copy in sync, but print uses current content if present
+    saveDocument();
+    const html = getHtmlForExport();
+    if (!html.trim()) {
+      alert("Nothing to print.");
+      return;
+    }
+    // Build/attach a print target container
+    const printTarget = document.createElement("div");
+    printTarget.className = `print-target ${CONTENT_CLASSES} ${themeClasses}`;
+    printTarget.style.fontFamily = `var(${perso.fontVar})`;
+    printTarget.style.fontSize = `${perso.fontSize}px`;
+    printTarget.style.lineHeight = String(perso.lineHeight);
+    printTarget.style.padding = "24px";
+    printTarget.innerHTML = html;
+    document.body.appendChild(printTarget);
+
+    // Inject print stylesheet to isolate target and set page options
+    const style = document.createElement("style");
+    const marginMap: Record<Personalization["printMargin"], string> = {
+      small: "8mm",
+      normal: "15mm",
+      large: "25mm",
+    };
+    const pageSize = perso.pageSize === "A4" ? "A4" : "Letter";
+    const orientation = perso.orientation === "landscape" ? "landscape" : "portrait";
+    const margin = marginMap[perso.printMargin];
+    style.setAttribute("data-print-style", "true");
+    style.textContent = `
+      @page { size: ${pageSize} ${orientation}; margin: ${margin}; }
+      @media print {
+        body * { visibility: hidden !important; }
+        .print-target, .print-target * { visibility: visible !important; }
+        .print-target { position: absolute; left: 0; top: 0; width: 100%; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Ensure fonts are loaded before print
+    type FontFaceSetLike = { ready?: Promise<void> };
+    const fonts = (document as Document & { fonts?: FontFaceSetLike }).fonts;
+    await fonts?.ready;
+
+    // Trigger print and cleanup afterwards
+    const cleanup = () => {
+      if (document.head.contains(style)) {
+        document.head.removeChild(style);
+      }
+      if (document.body.contains(printTarget)) {
+        document.body.removeChild(printTarget);
+      }
+      window.removeEventListener("afterprint", cleanup);
+    };
+    window.addEventListener("afterprint", cleanup);
+    window.print();
+  };
+
+  // Ctrl/Cmd+S to save
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      const isSave = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s";
+      if (isSave) {
+        e.preventDefault();
+        saveDocument();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [saveDocument]);
 
   return (
     <div className="w-full">
@@ -523,6 +679,14 @@ export default function RichTextEditor(): React.ReactElement {
             <button
               type="button"
               className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
+              onClick={saveDocument}
+            >Save</button>
+            {savedAt && (
+              <span className="text-xs text-[var(--color-text-muted)] mr-2">Saved ✓</span>
+            )}
+            <button
+              type="button"
+              className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
               onClick={exportHTML}
             >Export HTML</button>
             <button
@@ -543,7 +707,7 @@ export default function RichTextEditor(): React.ReactElement {
             <button
               type="button"
               className="px-3 py-1 rounded-md border border-gray-300 bg-white text-sm"
-              onClick={() => window.print()}
+              onClick={printSaved}
             >Print</button>
 
             <div className="w-px h-6 bg-gray-200 mx-2" />

@@ -97,3 +97,22 @@ yarn build
 ```
 
 Requirements: Node.js >= 20.10 with Corepack enabled (Yarn >= 4). The CI enforces these via `package.json` engines.
+
+## ✍️ Word‑like Editor (/editor)
+
+This project includes a rich text editor page similar to Word for writing, formatting, and personalizing documents.
+
+- Route: `/editor` (linked in the sidebar as "Editor")
+- Features:
+  - Formatting: bold, italic, underline, strike, highlight
+  - Headings (H1–H3), paragraphs, bullet and numbered lists
+  - Alignment: left, center, right, justify
+  - Links and auto-linking
+  - Personalization: font family (uses bundled Ethiopic fonts), font size, line height, page width, light/dark theme
+  - Auto‑save to the browser (localStorage)
+  - Export: HTML or TXT; Print to PDF via the browser print dialog
+
+Notes:
+
+- Fonts come from `src/app/fonts/loader.ts` via CSS variables (e.g., `--font-menbere`). The editor applies the selected font directly to the content.
+- The editor runs client‑side only and is dynamically imported to avoid SSR issues.

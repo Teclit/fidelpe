@@ -52,6 +52,9 @@ export default function Sidebar(): React.ReactElement {
                             <Link href="/fonts-demo" className="block rounded-md px-3 py-2 hover:bg-[var(--color-secondary)] text-sm" onClick={close}>
                                 Fonts demo
                             </Link>
+                            <Link href="/editor" className="block rounded-md px-3 py-2 hover:bg-[var(--color-secondary)] text-sm" onClick={close}>
+                                Editor
+                            </Link>
                         </nav>
                         <div className="mt-auto w-full text-center border-t border-gray-200 pt-4 text-xs text-[var(--color-text-muted)]">
                             © {new Date().getFullYear()}
@@ -71,6 +74,9 @@ export default function Sidebar(): React.ReactElement {
                     </Link>
                     <Link href="/fonts-demo" className="block rounded-md px-3 py-2 hover:bg-[var(--color-secondary)] text-sm">
                         Fonts demo
+                    </Link>
+                    <Link href="/editor" className="block rounded-md px-3 py-2 hover:bg-[var(--color-secondary)] text-sm">
+                        Editor
                     </Link>
                 </nav>
                 <div className="mt-auto w-full text-center border-t border-gray-200/70 pt-4 text-xs text-[var(--color-text-muted)]">

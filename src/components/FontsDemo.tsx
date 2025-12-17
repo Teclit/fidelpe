@@ -1,277 +1,423 @@
-'use client';
+"use client";
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from "react";
 
-/**
- * Composant de démonstration pour toutes les polices disponibles
- * Utilisez ce composant pour visualiser et tester toutes les polices
- */
-export default function FontsDemo() {
-    const sampleText = "ፊደልፐ ምስ ጽሑፋት - Sample Text 123";
-
-    const groups: { group: string; fonts: { name: string; className: string }[] }[] = useMemo(() => [
-        {
-            group: 'RaeyType',
-            fonts: [
-                { name: 'Brana', className: 'font-brana' },
-                { name: 'Geez Manuscript', className: 'font-geez-manuscript' },
-                { name: 'GF Zemenu', className: 'font-gfzemenu' },
-                { name: 'Geez Fantuwua', className: 'font-geez-fantuwua' },
-                { name: 'Geez Hiwua', className: 'font-geez-hiwua' },
-                { name: 'Geez Jiret', className: 'font-geez-jiret' },
-                { name: 'Geez Tint', className: 'font-geez-tint' },
-                { name: 'Geez Wookianos', className: 'font-geez-wookianos' },
-                { name: 'Geez Yebse', className: 'font-geez-yebse' },
-                { name: 'Geez Goffer', className: 'font-geez-goffer' },
-                { name: 'Geez Gothic', className: 'font-geez-gothic' },
-                { name: 'Geez Zelan', className: 'font-geez-zelan' },
-            ],
-        },
-        {
-            group: 'Google',
-            fonts: [
-                { name: 'Agbalumo', className: 'font-agbalumo' },
-                { name: 'Menbere', className: 'font-menbere' },
-            ],
-        },
-        {
-            group: 'Noto',
-            fonts: [
-                { name: 'Noto Sans Ethiopic', className: 'font-noto-sans-ethiopic' },
-                { name: 'Noto Serif Ethiopic', className: 'font-noto-serif-ethiopic' },
-            ],
-        },
-        {
-            group: 'SIL',
-            fonts: [
-                { name: 'Abyssinica SIL', className: 'font-abyssinica-sil' },
-                { name: 'Abyssinica SIL Connected', className: 'font-abyssinica-sil-connected' },
-            ],
-        },
-        {
-            group: 'Wazéma',
-            fonts: [
-                { name: 'Addis Abeba Unicode', className: 'font-addis-abeba-unicode' },
-                { name: 'Desta Unicode', className: 'font-desta-unicode' },
-                { name: 'Tesfa Unicode', className: 'font-tesfa-unicode' },
-            ],
-        },
-        {
-            group: 'SurGraphics',
-            fonts: [
-                { name: 'SurGraphics Regular', className: 'font-surgraphics' },
-            ],
-        },
-        {
-            group: 'TypeHabesha',
-            fonts: [
-                { name: 'Loga', className: 'font-loga' },
-                { name: 'Loga Display', className: 'font-loga-display' },
-                { name: 'Habesha Serif Distort', className: 'font-habesha-serif-distort' },
-                { name: 'Zibriqriq', className: 'font-zibriqriq' },
-            ],
-        },
-        {
-            group: 'AnbassaDesign',
-            fonts: [
-                { name: 'Adwa', className: 'font-adwa' },
-                { name: 'Adwa Sans Serif', className: 'font-adwa-sans-serif' },
-                { name: 'Entoto', className: 'font-entoto' },
-                { name: 'Godana', className: 'font-godana' },
-                { name: 'Meaza', className: 'font-meaza' },
-                { name: 'Neteru', className: 'font-neteru' },
-                { name: 'Shiromeda', className: 'font-shiromeda' },
-                { name: 'Shiromeda Serif', className: 'font-shiromeda-serif' },
-                { name: 'Tayitu', className: 'font-tayitu' },
-            ],
-        },
-        {
-            group: 'HaaHu',
-            fonts: [
-                { name: 'ETH_B_GOFA', className: 'font-eth-gofa' },
-            ],
-        },
-        {
-            group: 'HalwoteHareg',
-            fonts: [
-                { name: 'HH Lemd Mono', className: 'font-hh-lemd-mono' },
-            ],
-        },
-        {
-            group: 'Qedron',
-            fonts: [
-                { name: 'Kiros', className: 'font-kiros' },
-            ],
-        },
-        {
-            group: 'GeezFonts',
-            fonts: [
-                { name: 'Geez Pixels 2', className: 'font-geez-pixels-2' },
-                { name: 'GeezDigital V1', className: 'font-geez-digital-v1' },
-            ],
-        },
-        {
-            group: 'RoadToEthiopia',
-            fonts: [
-                { name: 'Addis', className: 'font-addis' },
-                { name: 'Dire Dawa', className: 'font-dire-dawa' },
-            ],
-        },
-        {
-            group: 'EducationalFonts',
-            fonts: [
-                { name: 'Geez Handwriting', className: 'font-geez-handwriting' },
-            ],
-        },
-        {
-            group: 'BlackFoundry',
-            fonts: [
-                { name: 'Abba Garima', className: 'font-abba-garima' },
-            ],
-        },
-        {
-            group: 'Fixedsys',
-            fonts: [
-                { name: 'Fixedsys', className: 'font-fixedsys' },
-            ],
-        },
-        {
-            group: 'TITUS',
-            fonts: [
-                { name: 'Cyberbit Basic', className: 'font-titus-cyberbit-basic' },
-            ],
-        },
-        {
-            group: 'YonathanSeyoum',
-            fonts: [
-                { name: 'Habesha Typewriter', className: 'font-habesha-typewriter' },
-                { name: 'Habesha Stencil', className: 'font-habesha-stencil' },
-                { name: 'Habesha Pixels', className: 'font-habesha-pixels' },
-                { name: 'Habesha Blocks', className: 'font-habesha-blocks' },
-            ],
-        },
-        {
-            group: 'ZamranStudio',
-            fonts: [
-                { name: 'Addis Sans', className: 'font-addis-sans' },
-                { name: 'Jegena Zamaric', className: 'font-jegena-zamaric' },
-                { name: 'Jegena Title Zamaric', className: 'font-jegena-title-zamaric' },
-                { name: 'Zamaric', className: 'font-zamaric' },
-            ],
-        },
-        {
-            group: 'AdilCreative',
-            fonts: [
-                { name: 'Adil', className: 'font-adil' },
-                { name: 'Selam', className: 'font-selam' },
-            ],
-        },
-        {
-            group: 'DotBoxDesignStudio',
-            fonts: [
-                { name: 'Ketefa', className: 'font-ketefa' },
-                { name: 'Semayawi', className: 'font-semayawi' },
-            ],
-        },
-        {
-            group: 'MetaAppz',
-            fonts: [
-                { name: 'Chiret', className: 'font-chiret' },
-                { name: 'Seat', className: 'font-seat' },
-                { name: 'Tera', className: 'font-tera' },
-            ],
-        },
-        {
-            group: 'Mulat',
-            fonts: [
-                { name: 'Mulat Abay', className: 'font-mulat-abay' },
-                { name: 'Mulat Addis', className: 'font-mulat-addis' },
-                { name: 'Mulat Ahmed', className: 'font-mulat-ahmed' },
-                { name: 'Mulat Asmara', className: 'font-mulat-asmara' },
-                { name: 'Mulat Awash', className: 'font-mulat-awash' },
-            ],
-        },
-        {
-            group: 'GNU',
-            fonts: [
-                { name: 'FreeSerif', className: 'font-free-serif' },
-            ],
-        },
-        {
-            group: 'Senamirmir',
-            fonts: [
-                { name: 'Ethiopic Abay', className: 'font-ethiopic-abay' },
-                { name: 'Ethiopic Lessan', className: 'font-ethiopic-lessan' },
-                { name: 'Ethiopic Le Tewahedo', className: 'font-ethiopic-le-tewahedo' },
-                { name: 'Ethiopic Sadiss', className: 'font-ethiopic-sadiss' },
-            ],
-        },
-    ], []);
-
-    // Accordion state: collapsed by default for compact view
-    const initialOpen = useMemo(() => Object.fromEntries(groups.map(g => [g.group, false])), [groups]);
-    const [open, setOpen] = useState<Record<string, boolean>>(initialOpen);
-
-    const toggle = (key: string) => setOpen(prev => ({ ...prev, [key]: !prev[key] }));
-
-    return (
-        <div className="p-8 max-w-5xl mx-auto">
-            <h1 className="mb-5 text-center font-sans">
-            Démonstration de toutes les polices
-            </h1>
-
-            {groups.map(({ group, fonts }) => {
-                const isOpen = open[group];
-                const count = fonts.length;
-                return (
-                    <div key={group} className="mb-4 border border-gray-200 bg-white rounded-lg shadow-sm">
-                        <button
-                            onClick={() => toggle(group)}
-                            aria-expanded={isOpen}
-                            className="w-full flex items-center justify-between gap-3 p-3 bg-transparent border-none cursor-pointer"
-                        >
-                            <div className="flex items-center gap-2.5 px-2 py-1 rounded">
-                                <span
-                                    aria-hidden
-                                    className={`inline-block transition-transform duration-150 ease-in-out ${isOpen ? 'rotate-90' : 'rotate-0'}`}
-                                >
-                                    ▸
-                                </span>
-                                <span className="font-sans text-base text-gray-900">{group}</span>
-                            </div>
-                            <span className="font-sans text-sm text-gray-500 bg-gray-100 border border-gray-200 px-2 py-0.5 rounded-full">
-                                {count}
-                            </span>
-                        </button>
-
-                        {isOpen && (
-                            <div className="p-3 pt-0 border-t border-gray-100">
-                                <div className="grid grid-cols-2 gap-3">
-                                    {fonts.map((font) => (
-                                        <div
-                                            key={font.className}
-                                            className="p-3 border border-gray-200 rounded-lg bg-white  shadow-sm"
-                                        >
-                                            <div className="text-xs text-gray-600 mb-1 font-sans flex justify-between gap-2">
-                                                <span>{font.name}</span>
-                                                <code className="bg-gray-100 px-1.5 py-0.5 rounded text-xs">
-                                                    .{font.className}
-                                                </code>
-                                            </div>
-                                            <div
-                                                className={`${font.className} text-xl leading-6`}
-                                            >
-                                                {sampleText}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                );
-            })}
-        </div>
-    );
+interface Font {
+  path: string;
+  city: string;
+  file: string;
+  family: string;
+  subfamily: string;
+  full_name: string;
 }
 
+interface CityMap {
+  [key: string]: string;
+}
+
+/**
+ * Geez Fonts Demonstration Component
+ * Displays fonts organized by city with live preview and controls
+ */
+export default function FontsDemo() {
+  const [fonts, setFonts] = useState<Font[]>([]);
+  const [cityMap, setCityMap] = useState<CityMap>({});
+  const [selectedCity, setSelectedCity] = useState<string>("");
+  const [selectedFont, setSelectedFont] = useState<string>("");
+  const [previewText, setPreviewText] = useState<string>("ሰላም");
+  const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>(
+    {
+      quick: true,
+      controls: false,
+      grid: false,
+    }
+  );
+
+  // Load fonts configuration
+  useEffect(() => {
+    Promise.all([
+      fetch("/fonts.min.json").then((res) => res.json()),
+      fetch("/city_name.json").then((res) => res.json()),
+    ])
+      .then(([fontsData, cityData]) => {
+        const fontsList = fontsData.fonts || [];
+        setFonts(fontsList);
+        setCityMap(cityData);
+
+        // Set initial city and font
+        if (fontsList.length > 0) {
+          const firstCity = fontsList[0].city;
+          setSelectedCity(firstCity);
+          setSelectedFont(
+            sanitizeName(
+              (fontsList[0].file || fontsList[0].path || "").replace(
+                /\.ttf$/i,
+                ""
+              )
+            )
+          );
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load fonts:", err);
+      });
+  }, []);
+
+  // Dynamically inject @font-face rules
+  useEffect(() => {
+    const styleId = "dynamic-fonts";
+    let styleEl = document.getElementById(styleId) as HTMLStyleElement;
+
+    if (!styleEl) {
+      styleEl = document.createElement("style");
+      styleEl.id = styleId;
+      document.head.appendChild(styleEl);
+    }
+
+    const rules = fonts
+      .map((f) => {
+        const faceName = sanitizeName(
+          (f.file || f.path || "").replace(/\.ttf$/i, "")
+        );
+        return `@font-face { font-family: "${faceName}"; src: url('/${f.path}') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }`;
+      })
+      .join("\n");
+
+    styleEl.textContent = rules;
+  }, [fonts]);
+
+  // Group fonts by city
+  const fontsByCity = useMemo(() => {
+    const grouped = new Map<string, Font[]>();
+    fonts.forEach((f) => {
+      if (!grouped.has(f.city)) grouped.set(f.city, []);
+      grouped.get(f.city)!.push(f);
+    });
+    return grouped;
+  }, [fonts]);
+
+  // Get sorted cities
+  const cities = useMemo(() => {
+    return Array.from(fontsByCity.keys()).sort();
+  }, [fontsByCity]);
+
+  // Get fonts for selected city
+  const cityFonts = useMemo(() => {
+    return fontsByCity.get(selectedCity) || [];
+  }, [fontsByCity, selectedCity]);
+
+  // Helper function to sanitize font name
+  function sanitizeName(str: string): string {
+    return "Geez_" + str.replace(/[^a-zA-Z0-9_\-]/g, "_");
+  }
+
+  // Toggle accordion
+  const toggleAccordion = (key: string) => {
+    setOpenAccordions((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  // Get city label (Tigrigna or English)
+  const getCityLabel = (cityEn: string): string => {
+    return cityMap[cityEn] || cityEn;
+  };
+
+  return (
+    <div className="p-8 max-w-7xl mx-auto">
+      <div className="mb-8 text-center">
+        <h1 className="text-4xl font-bold mb-3 text-gray-900">
+          Geez Fonts Demonstration
+        </h1>
+        <p className="text-gray-600">
+          Preview fonts organized by city. Sources loaded from fonts.min.json.
+        </p>
+      </div>
+
+      {/* Quick Preview by Sample */}
+      <details
+        open={openAccordions.quick}
+        className="mb-4 border border-gray-200 bg-white rounded-lg shadow-sm"
+      >
+        <summary
+          onClick={(e) => {
+            e.preventDefault();
+            toggleAccordion("quick");
+          }}
+          className="cursor-pointer flex items-center justify-between p-4 list-none select-none hover:bg-gray-50"
+        >
+          <div className="flex items-center gap-3">
+            <svg
+              className={`w-5 h-5 text-gray-500 transition-transform ${
+                openAccordions.quick ? "rotate-90" : ""
+              }`}
+              fill="none"
+              viewBox="0 0 20 20"
+            >
+              <path
+                d="M5 8l5 5 5-5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="text-lg font-semibold text-gray-900">
+              Quick preview by sample
+            </span>
+          </div>
+        </summary>
+
+        {openAccordions.quick && (
+          <div className="p-4 pt-0 border-t border-gray-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {cities.slice(0, 6).map((city) => {
+                const cityFontsPreview = fontsByCity.get(city) || [];
+                const firstFont = cityFontsPreview[0];
+                if (!firstFont) return null;
+                const faceName = sanitizeName(
+                  (firstFont.file || firstFont.path || "").replace(
+                    /\.ttf$/i,
+                    ""
+                  )
+                );
+
+                return (
+                  <div
+                    key={city}
+                    className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                      <span className="text-sm font-medium text-gray-700">
+                        {getCityLabel(city)}
+                      </span>
+                    </div>
+                    <div
+                      className="text-2xl text-gray-900"
+                      style={{
+                        fontFamily: `'${faceName}', system-ui, sans-serif`,
+                      }}
+                    >
+                      {previewText}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </details>
+
+      {/* Dropdown & Controls */}
+      <details
+        open={openAccordions.controls}
+        className="mb-4 border border-gray-200 bg-white rounded-lg shadow-sm"
+      >
+        <summary
+          onClick={(e) => {
+            e.preventDefault();
+            toggleAccordion("controls");
+          }}
+          className="cursor-pointer flex items-center justify-between p-4 list-none select-none hover:bg-gray-50"
+        >
+          <div className="flex items-center gap-3">
+            <svg
+              className={`w-5 h-5 text-gray-500 transition-transform ${
+                openAccordions.controls ? "rotate-90" : ""
+              }`}
+              fill="none"
+              viewBox="0 0 20 20"
+            >
+              <path
+                d="M5 8l5 5 5-5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="text-lg font-semibold text-gray-900">
+              Dropdown & controls
+            </span>
+          </div>
+        </summary>
+
+        {openAccordions.controls && (
+          <div className="p-4 pt-0 border-t border-gray-100">
+            <div className="flex flex-wrap gap-4 mb-6">
+              <div className="flex-1 min-w-50">
+                <label
+                  htmlFor="citySelect"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  City:
+                </label>
+                <select
+                  id="citySelect"
+                  value={selectedCity}
+                  onChange={(e) => {
+                    setSelectedCity(e.target.value);
+                    const newCityFonts = fontsByCity.get(e.target.value) || [];
+                    if (newCityFonts.length > 0) {
+                      setSelectedFont(
+                        sanitizeName(
+                          (
+                            newCityFonts[0].file ||
+                            newCityFonts[0].path ||
+                            ""
+                          ).replace(/\.ttf$/i, "")
+                        )
+                      );
+                    }
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  {cities.map((city) => (
+                    <option key={city} value={city}>
+                      {getCityLabel(city)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex-1 min-w-50">
+                <label
+                  htmlFor="fontSelect"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Font:
+                </label>
+                <select
+                  id="fontSelect"
+                  value={selectedFont}
+                  onChange={(e) => setSelectedFont(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  {cityFonts.map((f) => {
+                    const faceName = sanitizeName(
+                      (f.file || f.path || "").replace(/\.ttf$/i, "")
+                    );
+                    return (
+                      <option key={faceName} value={faceName}>
+                        {f.family || f.full_name || f.file}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              <div className="flex-1 min-w-50">
+                <label
+                  htmlFor="textInput"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Text:
+                </label>
+                <input
+                  id="textInput"
+                  type="text"
+                  value={previewText}
+                  onChange={(e) => setPreviewText(e.target.value || "ሰላም")}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+
+            <div
+              className="p-6 border-2 border-gray-200 rounded-lg bg-gray-50 text-center text-4xl"
+              style={{ fontFamily: `'${selectedFont}', system-ui, sans-serif` }}
+            >
+              {previewText}
+            </div>
+          </div>
+        )}
+      </details>
+
+      {/* Preview Grid for Selected City */}
+      <details
+        open={openAccordions.grid}
+        className="mb-4 border border-gray-200 bg-white rounded-lg shadow-sm"
+      >
+        <summary
+          onClick={(e) => {
+            e.preventDefault();
+            toggleAccordion("grid");
+          }}
+          className="cursor-pointer flex items-center justify-between p-4 list-none select-none hover:bg-gray-50"
+        >
+          <div className="flex items-center gap-3">
+            <svg
+              className={`w-5 h-5 text-gray-500 transition-transform ${
+                openAccordions.grid ? "rotate-90" : ""
+              }`}
+              fill="none"
+              viewBox="0 0 20 20"
+            >
+              <path
+                d="M5 8l5 5 5-5"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="text-lg font-semibold text-gray-900">
+              Preview grid for selected city
+            </span>
+          </div>
+          {selectedCity && (
+            <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              {cityFonts.length} {cityFonts.length === 1 ? "font" : "fonts"}
+            </span>
+          )}
+        </summary>
+
+        {openAccordions.grid && (
+          <div className="p-4 pt-0 border-t border-gray-100">
+            <div className="mb-4 text-lg font-semibold text-gray-700">
+              City: {getCityLabel(selectedCity)} ({selectedCity})
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {cityFonts.map((f) => {
+                const faceName = sanitizeName(
+                  (f.file || f.path || "").replace(/\.ttf$/i, "")
+                );
+
+                return (
+                  <div
+                    key={f.path}
+                    className="p-4 border border-gray-200 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <span className="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>
+                        <span className="text-xs text-gray-600 truncate">
+                          {f.family || f.full_name || f.file}
+                        </span>
+                      </div>
+                      <a
+                        href={`/${f.path}`}
+                        download={f.file}
+                        className="text-xs text-blue-600 hover:text-blue-800 underline shrink-0"
+                      >
+                        Download
+                      </a>
+                    </div>
+                    <div
+                      className="text-xl text-gray-900 wrap-break-word"
+                      style={{
+                        fontFamily: `'${faceName}', system-ui, sans-serif`,
+                      }}
+                    >
+                      {previewText}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </details>
+    </div>
+  );
+}

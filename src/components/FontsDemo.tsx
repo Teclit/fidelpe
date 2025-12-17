@@ -25,6 +25,8 @@ export default function FontsDemo() {
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [selectedFont, setSelectedFont] = useState<string>("");
   const [previewText, setPreviewText] = useState<string>("ሰላም");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
   const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>(
     {
       quick: true,
@@ -33,38 +35,64 @@ export default function FontsDemo() {
     }
   );
 
+  // Helper function to sanitize font name - moved up to use in useEffect
+  const sanitizeName = (str: string): string => {
+    return "Geez_" + str.replace(/[^a-zA-Z0-9_\-]/g, "_");
+  };
+
   // Load fonts configuration
   useEffect(() => {
+    setLoading(true);
+    setError("");
+
     Promise.all([
-      fetch("/fonts.min.json").then((res) => res.json()),
-      fetch("/city_name.json").then((res) => res.json()),
+      fetch("/fonts.min.json").then((res) => {
+        if (!res.ok) throw new Error(`Failed to fetch fonts.min.json: ${res.status}`);
+        return res.json();
+      }),
+      fetch("/city_name.json").then((res) => {
+        if (!res.ok) throw new Error(`Failed to fetch city_name.json: ${res.status}`);
+        return res.json();
+      }),
     ])
       .then(([fontsData, cityData]) => {
         const fontsList = fontsData.fonts || [];
+        console.log(`Loaded ${fontsList.length} fonts from fonts.min.json`);
+
+        if (fontsList.length === 0) {
+          setError("No fonts found in fonts.min.json");
+          setLoading(false);
+          return;
+        }
+
         setFonts(fontsList);
         setCityMap(cityData);
 
         // Set initial city and font
-        if (fontsList.length > 0) {
-          const firstCity = fontsList[0].city;
-          setSelectedCity(firstCity);
-          setSelectedFont(
-            sanitizeName(
-              (fontsList[0].file || fontsList[0].path || "").replace(
-                /\.ttf$/i,
-                ""
-              )
+        const firstCity = fontsList[0].city;
+        setSelectedCity(firstCity);
+        setSelectedFont(
+          sanitizeName(
+            (fontsList[0].file || fontsList[0].path || "").replace(
+              /\.ttf$/i,
+              ""
             )
-          );
-        }
+          )
+        );
+
+        setLoading(false);
       })
       .catch((err) => {
         console.error("Failed to load fonts:", err);
+        setError(`Error loading fonts: ${err.message}`);
+        setLoading(false);
       });
   }, []);
 
   // Dynamically inject @font-face rules
   useEffect(() => {
+    if (fonts.length === 0) return;
+
     const styleId = "dynamic-fonts";
     let styleEl = document.getElementById(styleId) as HTMLStyleElement;
 
@@ -84,6 +112,7 @@ export default function FontsDemo() {
       .join("\n");
 
     styleEl.textContent = rules;
+    console.log(`Injected ${fonts.length} @font-face rules`);
   }, [fonts]);
 
   // Group fonts by city
@@ -106,11 +135,6 @@ export default function FontsDemo() {
     return fontsByCity.get(selectedCity) || [];
   }, [fontsByCity, selectedCity]);
 
-  // Helper function to sanitize font name
-  function sanitizeName(str: string): string {
-    return "Geez_" + str.replace(/[^a-zA-Z0-9_\-]/g, "_");
-  }
-
   // Toggle accordion
   const toggleAccordion = (key: string) => {
     setOpenAccordions((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -121,6 +145,52 @@ export default function FontsDemo() {
     return cityMap[cityEn] || cityEn;
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="p-8 max-w-7xl mx-auto">
+        <div className="flex items-center justify-center min-h-100">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-gray-900 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading fonts...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="p-8 max-w-7xl mx-auto">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <h2 className="text-red-800 font-semibold mb-2">Error Loading Fonts</h2>
+          <p className="text-red-600">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty state
+  if (fonts.length === 0) {
+    return (
+      <div className="p-8 max-w-7xl mx-auto">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+          <h2 className="text-yellow-800 font-semibold mb-2">No Fonts Found</h2>
+          <p className="text-yellow-600">
+            No fonts were loaded from fonts.min.json. Please check the file.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <div className="mb-8 text-center">
@@ -128,7 +198,7 @@ export default function FontsDemo() {
           Geez Fonts Demonstration
         </h1>
         <p className="text-gray-600">
-          Preview fonts organized by city. Sources loaded from fonts.min.json.
+          Preview {fonts.length} fonts organized by {cities.length} cities. Sources loaded from fonts.min.json.
         </p>
       </div>
 

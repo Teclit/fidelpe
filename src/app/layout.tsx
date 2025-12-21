@@ -1,71 +1,67 @@
 // src/app/layout.tsx
 import "./globals.css";
-import path from "path";
 import { ReactNode } from "react";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Sidebar from "@/components/Sidebar";
 
-const fontPath = (relative: string) =>
-  path.join(process.cwd(), "public", relative);
-
 // Polices individuelles pour utilisation séparée
 const brana = localFont({
-  src: fontPath("fonts/Dekemhare/DekemhareBeilul.ttf"),
+  src: "../../../public/fonts/Dekemhare/DekemhareBeilul.ttf",
   display: "swap",
   variable: "--font-brana",
 });
 
 const geezManuscript = localFont({
-  src: fontPath("fonts/EmniHaili/EmniHaili.ttf"),
+  src: "../../../public/fonts/EmniHaili/EmniHaili.ttf",
   display: "swap",
   variable: "--font-geez-manuscript",
 });
 
 const gfzemenu = localFont({
-  src: fontPath("fonts/AdiQuala/adiQuala_Himberti.ttf"),
+  src: "../../../public/fonts/AdiQuala/adiQuala_Himberti.ttf",
   display: "swap",
   variable: "--font-gfzemenu",
 });
 
 const geezFantuwua = localFont({
-  src: fontPath("fonts/GeezFonts/GeezHandwriting.ttf"),
+  src: "../../../public/fonts/GeezFonts/GeezHandwriting.ttf",
   display: "swap",
   variable: "--font-geez-fantuwua",
 });
 
 const geezHiwua = localFont({
-  src: fontPath("fonts/GeezFonts/GeezHandwritingBold.ttf"),
+  src: "../../../public/fonts/GeezFonts/GeezHandwritingBold.ttf",
   display: "swap",
   variable: "--font-geez-hiwua",
 });
 
 const geezJiret = localFont({
-  src: fontPath("fonts/GeezFonts/GeezHandwritingOutlines.ttf"),
+  src: "../../../public/fonts/GeezFonts/GeezHandwritingOutlines.ttf",
   display: "swap",
   variable: "--font-geez-jiret",
 });
 
 const geezTint = localFont({
-  src: fontPath("fonts/GeezFonts/GeezHandwritingDots.ttf"),
+  src: "../../../public/fonts/GeezFonts/GeezHandwritingDots.ttf",
   display: "swap",
   variable: "--font-geez-tint",
 });
 
 const geezWookianos = localFont({
-  src: fontPath("fonts/Mendefera/MendeferaNakfa-Regular.ttf"),
+  src: "../../../public/fonts/Mendefera/MendeferaNakfa-Regular.ttf",
   display: "swap",
   variable: "--font-geez-wookianos",
 });
 
 const geezYebse = localFont({
-  src: fontPath("fonts/Senafe/SenafeLogoSarda-Medium.ttf"),
+  src: "../../../public/fonts/Senafe/SenafeLogoSarda-Medium.ttf",
   display: "swap",
   variable: "--font-geez-yebse",
 });
 
 const geezGoffer = localFont({
-  src: fontPath("fonts/GeezFonts/GeezHandwritingWithArrows.ttf"),
+  src: "../../../public/fonts/GeezFonts/GeezHandwritingWithArrows.ttf",
   display: "swap",
   variable: "--font-geez-goffer",
 });

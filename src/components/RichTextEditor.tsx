@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -38,10 +44,12 @@ const DEFAULT_PERSO: Personalization = {
 const STORAGE_KEY_CONTENT = "editor.document.html";
 const STORAGE_KEY_PERSO = "editor.perso";
 // Legacy default template we used previously; treat it as empty to avoid exporting it
-const DEFAULT_TEMPLATE_HTML = "<h2>Welcome</h2><p>Start typing your document here…</p>";
+const DEFAULT_TEMPLATE_HTML =
+  "<h2>Welcome</h2><p>Start typing your document here…</p>";
 
 // Keep content rendering consistent between on-screen, export, and print
-const CONTENT_CLASSES = "max-w-none focus:outline-none min-h-[50vh] [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_p]:my-2 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:ml-6 [&_ol]:ml-6";
+const CONTENT_CLASSES =
+  "max-w-none focus:outline-none min-h-[50vh] [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_p]:my-2 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:ml-6 [&_ol]:ml-6";
 
 const FONT_OPTIONS: Array<{ label: string; varName: string }> = [
   // RaeyType (from layout.tsx)
@@ -68,10 +76,16 @@ const FONT_OPTIONS: Array<{ label: string; varName: string }> = [
 
   // SIL
   { label: "Abyssinica SIL", varName: "--font-abyssinica-sil" },
-  { label: "Abyssinica SIL Connected", varName: "--font-abyssinica-sil-connected" },
+  {
+    label: "Abyssinica SIL Connected",
+    varName: "--font-abyssinica-sil-connected",
+  },
 
   // Wazéma
-  { label: "Addis Abeba Unicode (Wazéma)", varName: "--font-addis-abeba-unicode" },
+  {
+    label: "Addis Abeba Unicode (Wazéma)",
+    varName: "--font-addis-abeba-unicode",
+  },
   { label: "Desta Unicode (Wazéma)", varName: "--font-desta-unicode" },
   { label: "Tesfa Unicode (Wazéma)", varName: "--font-tesfa-unicode" },
 
@@ -81,18 +95,27 @@ const FONT_OPTIONS: Array<{ label: string; varName: string }> = [
   // TypeHabesha
   { label: "Loga (TypeHabesha)", varName: "--font-loga" },
   { label: "Loga Display (TypeHabesha)", varName: "--font-loga-display" },
-  { label: "Habesha Serif Distort (TypeHabesha)", varName: "--font-habesha-serif-distort" },
+  {
+    label: "Habesha Serif Distort (TypeHabesha)",
+    varName: "--font-habesha-serif-distort",
+  },
   { label: "Zibriqriq (TypeHabesha)", varName: "--font-zibriqriq" },
 
   // AnbassaDesign
   { label: "Adwa (AnbassaDesign)", varName: "--font-adwa" },
-  { label: "Adwa Sans Serif (AnbassaDesign)", varName: "--font-adwa-sans-serif" },
+  {
+    label: "Adwa Sans Serif (AnbassaDesign)",
+    varName: "--font-adwa-sans-serif",
+  },
   { label: "Entoto (AnbassaDesign)", varName: "--font-entoto" },
   { label: "Godana (AnbassaDesign)", varName: "--font-godana" },
   { label: "Meaza (AnbassaDesign)", varName: "--font-meaza" },
   { label: "Neteru (AnbassaDesign)", varName: "--font-neteru" },
   { label: "Shiromeda (AnbassaDesign)", varName: "--font-shiromeda" },
-  { label: "Shiromeda Serif (AnbassaDesign)", varName: "--font-shiromeda-serif" },
+  {
+    label: "Shiromeda Serif (AnbassaDesign)",
+    varName: "--font-shiromeda-serif",
+  },
   { label: "Tayitu (AnbassaDesign)", varName: "--font-tayitu" },
 
   // HaaHu
@@ -113,7 +136,10 @@ const FONT_OPTIONS: Array<{ label: string; varName: string }> = [
   { label: "Dire Dawa (RoadToEthiopia)", varName: "--font-dire-dawa" },
 
   // EducationalFonts
-  { label: "Geez Handwriting (EducationalFonts)", varName: "--font-geez-handwriting" },
+  {
+    label: "Geez Handwriting (EducationalFonts)",
+    varName: "--font-geez-handwriting",
+  },
 
   // BlackFoundry
   { label: "Abba Garima (BlackFoundry)", varName: "--font-abba-garima" },
@@ -125,15 +151,30 @@ const FONT_OPTIONS: Array<{ label: string; varName: string }> = [
   { label: "TITUS Cyberbit Basic", varName: "--font-titus-cyberbit-basic" },
 
   // YonathanSeyoum
-  { label: "Habesha Typewriter (YonathanSeyoum)", varName: "--font-habesha-typewriter" },
-  { label: "Habesha Stencil (YonathanSeyoum)", varName: "--font-habesha-stencil" },
-  { label: "Habesha Pixels (YonathanSeyoum)", varName: "--font-habesha-pixels" },
-  { label: "Habesha Blocks (YonathanSeyoum)", varName: "--font-habesha-blocks" },
+  {
+    label: "Habesha Typewriter (YonathanSeyoum)",
+    varName: "--font-habesha-typewriter",
+  },
+  {
+    label: "Habesha Stencil (YonathanSeyoum)",
+    varName: "--font-habesha-stencil",
+  },
+  {
+    label: "Habesha Pixels (YonathanSeyoum)",
+    varName: "--font-habesha-pixels",
+  },
+  {
+    label: "Habesha Blocks (YonathanSeyoum)",
+    varName: "--font-habesha-blocks",
+  },
 
   // ZamranStudio
   { label: "Addis Sans (ZamranStudio)", varName: "--font-addis-sans" },
   { label: "Jegena Zamaric (ZamranStudio)", varName: "--font-jegena-zamaric" },
-  { label: "Jegena Title Zamaric (ZamranStudio)", varName: "--font-jegena-title-zamaric" },
+  {
+    label: "Jegena Title Zamaric (ZamranStudio)",
+    varName: "--font-jegena-title-zamaric",
+  },
   { label: "Zamaric (ZamranStudio)", varName: "--font-zamaric" },
 
   // AdilCreative
@@ -162,7 +203,10 @@ const FONT_OPTIONS: Array<{ label: string; varName: string }> = [
   // Senamirmir
   { label: "Ethiopic Abay (Senamirmir)", varName: "--font-ethiopic-abay" },
   { label: "Ethiopic Lessan (Senamirmir)", varName: "--font-ethiopic-lessan" },
-  { label: "Ethiopic Le Tewahedo (Senamirmir)", varName: "--font-ethiopic-le-tewahedo" },
+  {
+    label: "Ethiopic Le Tewahedo (Senamirmir)",
+    varName: "--font-ethiopic-le-tewahedo",
+  },
   { label: "Ethiopic Sadiss (Senamirmir)", varName: "--font-ethiopic-sadiss" },
 ];
 
@@ -172,7 +216,8 @@ const MAX_FONT_SIZE = 300; // practical upper bound; browsers can render larger 
 const SIZE_PRESETS: number[] = [
   12, 14, 16, 18, 20, 24, 28, 32, 36, 48, 60, 72, 96, 120, 144, 192, 240, 300,
 ];
-const clampSize = (val: number) => Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, val));
+const clampSize = (val: number) =>
+  Math.max(MIN_FONT_SIZE, Math.min(MAX_FONT_SIZE, val));
 
 // Line-height controls
 const MIN_LINE = 0.8;
@@ -199,9 +244,13 @@ function ToolbarButton({
       title={title}
       onClick={onClick}
       disabled={disabled}
-      className={"px-2 py-1 rounded-md border text-sm mr-1 mb-1 transition " +
-        (active ? "bg-[var(--color-accent)] text-white border-[var(--color-accent)]" : "bg-white hover:bg-gray-50 border-gray-300 text-[var(--color-text-dark)]") +
-        (disabled ? " opacity-50 cursor-not-allowed" : "")}
+      className={
+        "px-2 py-1 rounded-md border text-sm mr-1 mb-1 transition " +
+        (active
+          ? "bg-(--color-accent) text-white border-(--color-accent)"
+          : "bg-white hover:bg-gray-50 border-gray-300 text-(--color-text-dark)") +
+        (disabled ? " opacity-50 cursor-not-allowed" : "")
+      }
     >
       {children}
     </button>
@@ -239,18 +288,20 @@ export default function RichTextEditor(): React.ReactElement {
     }
   }, []);
 
-  
-
   const editor = useEditor({
     // Prevent SSR hydration mismatches per TipTap guidance
     immediatelyRender: false,
     extensions: [
-  Color.configure({ types: ["textStyle"] }),
-  TextStyle,
+      Color.configure({ types: ["textStyle"] }),
+      TextStyle,
       FontFamily,
       Underline,
       Highlight,
-      Link.configure({ openOnClick: true, autolink: true, protocols: ["http", "https", "mailto"] }),
+      Link.configure({
+        openOnClick: true,
+        autolink: true,
+        protocols: ["http", "https", "mailto"],
+      }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Placeholder.configure({ placeholder: "Type here…" }),
       StarterKit.configure({
@@ -309,9 +360,17 @@ export default function RichTextEditor(): React.ReactElement {
     [editor]
   );
 
-  const themeClasses = perso.theme === "dark" ? "bg-gray-900 text-gray-100" : "bg-white text-[var(--color-text-dark)]";
+  const themeClasses =
+    perso.theme === "dark"
+      ? "bg-gray-900 text-gray-100"
+      : "bg-white text-(--color-text-dark)";
 
-  const wrapperMaxW = perso.pageWidth === "narrow" ? "max-w-2xl" : perso.pageWidth === "wide" ? "max-w-6xl" : "max-w-4xl";
+  const wrapperMaxW =
+    perso.pageWidth === "narrow"
+      ? "max-w-2xl"
+      : perso.pageWidth === "wide"
+      ? "max-w-6xl"
+      : "max-w-4xl";
 
   const exportHTML = () => {
     // Keep saved copy in sync, but export uses current content if present
@@ -358,7 +417,9 @@ export default function RichTextEditor(): React.ReactElement {
     node.style.left = "-99999px";
     node.style.top = "-99999px";
     node.style.pointerEvents = "none";
-    node.style.width = captureRef.current ? `${captureRef.current.clientWidth}px` : "auto";
+    node.style.width = captureRef.current
+      ? `${captureRef.current.clientWidth}px`
+      : "auto";
     node.innerHTML = savedHtml;
     document.body.appendChild(node);
     return node;
@@ -376,8 +437,11 @@ export default function RichTextEditor(): React.ReactElement {
     const bg = perso.theme === "dark" ? "#111827" : "#ffffff";
     // Resolve CSS variable to an actual font-family stack string for capture
     const root = document.documentElement;
-    const varValue = getComputedStyle(root).getPropertyValue(perso.fontVar)?.trim();
-    const resolvedFont = varValue || (node ? getComputedStyle(node).fontFamily : "serif");
+    const varValue = getComputedStyle(root)
+      .getPropertyValue(perso.fontVar)
+      ?.trim();
+    const resolvedFont =
+      varValue || (node ? getComputedStyle(node).fontFamily : "serif");
     try {
       // Ensure fonts are loaded; skipFonts avoids problematic font parsing/embedding
       type FontFaceSetLike = { ready?: Promise<void> };
@@ -418,8 +482,11 @@ export default function RichTextEditor(): React.ReactElement {
     const node = buildOffscreenNodeFromSaved(html);
     const bg = perso.theme === "dark" ? "#111827" : "#ffffff";
     const root = document.documentElement;
-    const varValue = getComputedStyle(root).getPropertyValue(perso.fontVar)?.trim();
-    const resolvedFont = varValue || (node ? getComputedStyle(node).fontFamily : "serif");
+    const varValue = getComputedStyle(root)
+      .getPropertyValue(perso.fontVar)
+      ?.trim();
+    const resolvedFont =
+      varValue || (node ? getComputedStyle(node).fontFamily : "serif");
     try {
       type FontFaceSetLike = { ready?: Promise<void> };
       const fonts = (document as Document & { fonts?: FontFaceSetLike }).fonts;
@@ -477,7 +544,8 @@ export default function RichTextEditor(): React.ReactElement {
       large: "25mm",
     };
     const pageSize = perso.pageSize === "A4" ? "A4" : "Letter";
-    const orientation = perso.orientation === "landscape" ? "landscape" : "portrait";
+    const orientation =
+      perso.orientation === "landscape" ? "landscape" : "portrait";
     const margin = marginMap[perso.printMargin];
     style.setAttribute("data-print-style", "true");
     style.textContent = `
@@ -525,35 +593,145 @@ export default function RichTextEditor(): React.ReactElement {
   return (
     <div className="w-full">
       {/* Toolbar */}
-      <div className="sticky top-0 z-10 mb-3 p-2 rounded-lg border border-[var(--card-border)] bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70">
+      <div className="sticky top-0 z-10 mb-3 p-2 rounded-lg border border-(--card-border) bg-white/90 backdrop-blur supports-backdrop-filter:bg-white/70">
         <div className="flex flex-wrap items-center">
-          <ToolbarButton title="Undo" onClick={() => editor?.chain().focus().undo().run()} disabled={!editor?.can().undo?.()}>↶</ToolbarButton>
-          <ToolbarButton title="Redo" onClick={() => editor?.chain().focus().redo().run()} disabled={!editor?.can().redo?.()}>↷</ToolbarButton>
+          <ToolbarButton
+            title="Undo"
+            onClick={() => editor?.chain().focus().undo().run()}
+            disabled={!editor?.can().undo?.()}
+          >
+            ↶
+          </ToolbarButton>
+          <ToolbarButton
+            title="Redo"
+            onClick={() => editor?.chain().focus().redo().run()}
+            disabled={!editor?.can().redo?.()}
+          >
+            ↷
+          </ToolbarButton>
 
           <div className="w-px h-6 bg-gray-200 mx-2" />
 
-          <ToolbarButton title="Bold" active={!!editor?.isActive("bold")} onClick={() => editor?.chain().focus().toggleBold().run()}>B</ToolbarButton>
-          <ToolbarButton title="Italic" active={!!editor?.isActive("italic")} onClick={() => editor?.chain().focus().toggleItalic().run()}><em>I</em></ToolbarButton>
-          <ToolbarButton title="Underline" active={!!editor?.isActive("underline")} onClick={() => editor?.chain().focus().toggleUnderline().run()}><u>U</u></ToolbarButton>
-          <ToolbarButton title="Strike" active={!!editor?.isActive("strike")} onClick={() => editor?.chain().focus().toggleStrike().run()}><s>S</s></ToolbarButton>
-          <ToolbarButton title="Highlight" active={!!editor?.isActive("highlight")} onClick={() => editor?.chain().focus().toggleHighlight().run()}>HL</ToolbarButton>
+          <ToolbarButton
+            title="Bold"
+            active={!!editor?.isActive("bold")}
+            onClick={() => editor?.chain().focus().toggleBold().run()}
+          >
+            B
+          </ToolbarButton>
+          <ToolbarButton
+            title="Italic"
+            active={!!editor?.isActive("italic")}
+            onClick={() => editor?.chain().focus().toggleItalic().run()}
+          >
+            <em>I</em>
+          </ToolbarButton>
+          <ToolbarButton
+            title="Underline"
+            active={!!editor?.isActive("underline")}
+            onClick={() => editor?.chain().focus().toggleUnderline().run()}
+          >
+            <u>U</u>
+          </ToolbarButton>
+          <ToolbarButton
+            title="Strike"
+            active={!!editor?.isActive("strike")}
+            onClick={() => editor?.chain().focus().toggleStrike().run()}
+          >
+            <s>S</s>
+          </ToolbarButton>
+          <ToolbarButton
+            title="Highlight"
+            active={!!editor?.isActive("highlight")}
+            onClick={() => editor?.chain().focus().toggleHighlight().run()}
+          >
+            HL
+          </ToolbarButton>
 
           <div className="w-px h-6 bg-gray-200 mx-2" />
 
-          <ToolbarButton title="H1" active={!!editor?.isActive("heading", { level: 1 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}>H1</ToolbarButton>
-          <ToolbarButton title="H2" active={!!editor?.isActive("heading", { level: 2 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}>H2</ToolbarButton>
-          <ToolbarButton title="H3" active={!!editor?.isActive("heading", { level: 3 })} onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}>H3</ToolbarButton>
-          <ToolbarButton title="Paragraph" active={!!editor?.isActive("paragraph")} onClick={() => editor?.chain().focus().setParagraph().run()}>P</ToolbarButton>
+          <ToolbarButton
+            title="H1"
+            active={!!editor?.isActive("heading", { level: 1 })}
+            onClick={() =>
+              editor?.chain().focus().toggleHeading({ level: 1 }).run()
+            }
+          >
+            H1
+          </ToolbarButton>
+          <ToolbarButton
+            title="H2"
+            active={!!editor?.isActive("heading", { level: 2 })}
+            onClick={() =>
+              editor?.chain().focus().toggleHeading({ level: 2 }).run()
+            }
+          >
+            H2
+          </ToolbarButton>
+          <ToolbarButton
+            title="H3"
+            active={!!editor?.isActive("heading", { level: 3 })}
+            onClick={() =>
+              editor?.chain().focus().toggleHeading({ level: 3 }).run()
+            }
+          >
+            H3
+          </ToolbarButton>
+          <ToolbarButton
+            title="Paragraph"
+            active={!!editor?.isActive("paragraph")}
+            onClick={() => editor?.chain().focus().setParagraph().run()}
+          >
+            P
+          </ToolbarButton>
 
-          <ToolbarButton title="Bullet List" active={!!editor?.isActive("bulletList")} onClick={() => editor?.chain().focus().toggleBulletList().run()}>• List</ToolbarButton>
-          <ToolbarButton title="Ordered List" active={!!editor?.isActive("orderedList")} onClick={() => editor?.chain().focus().toggleOrderedList().run()}>1. List</ToolbarButton>
+          <ToolbarButton
+            title="Bullet List"
+            active={!!editor?.isActive("bulletList")}
+            onClick={() => editor?.chain().focus().toggleBulletList().run()}
+          >
+            • List
+          </ToolbarButton>
+          <ToolbarButton
+            title="Ordered List"
+            active={!!editor?.isActive("orderedList")}
+            onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+          >
+            1. List
+          </ToolbarButton>
 
           <div className="w-px h-6 bg-gray-200 mx-2" />
 
-          <ToolbarButton title="Align Left" active={!!editor?.isActive({ textAlign: "left" })} onClick={() => editor?.chain().focus().setTextAlign("left").run()}>⟸</ToolbarButton>
-          <ToolbarButton title="Align Center" active={!!editor?.isActive({ textAlign: "center" })} onClick={() => editor?.chain().focus().setTextAlign("center").run()}>≡</ToolbarButton>
-          <ToolbarButton title="Align Right" active={!!editor?.isActive({ textAlign: "right" })} onClick={() => editor?.chain().focus().setTextAlign("right").run()}>⟹</ToolbarButton>
-          <ToolbarButton title="Justify" active={!!editor?.isActive({ textAlign: "justify" })} onClick={() => editor?.chain().focus().setTextAlign("justify").run()}>≣</ToolbarButton>
+          <ToolbarButton
+            title="Align Left"
+            active={!!editor?.isActive({ textAlign: "left" })}
+            onClick={() => editor?.chain().focus().setTextAlign("left").run()}
+          >
+            ⟸
+          </ToolbarButton>
+          <ToolbarButton
+            title="Align Center"
+            active={!!editor?.isActive({ textAlign: "center" })}
+            onClick={() => editor?.chain().focus().setTextAlign("center").run()}
+          >
+            ≡
+          </ToolbarButton>
+          <ToolbarButton
+            title="Align Right"
+            active={!!editor?.isActive({ textAlign: "right" })}
+            onClick={() => editor?.chain().focus().setTextAlign("right").run()}
+          >
+            ⟹
+          </ToolbarButton>
+          <ToolbarButton
+            title="Justify"
+            active={!!editor?.isActive({ textAlign: "justify" })}
+            onClick={() =>
+              editor?.chain().focus().setTextAlign("justify").run()
+            }
+          >
+            ≣
+          </ToolbarButton>
 
           <div className="w-px h-6 bg-gray-200 mx-2" />
 
@@ -564,7 +742,9 @@ export default function RichTextEditor(): React.ReactElement {
             onChange={(e) => setFont(e.target.value)}
           >
             {FONT_OPTIONS.map((f) => (
-              <option key={f.varName} value={f.varName}>{f.label}</option>
+              <option key={f.varName} value={f.varName}>
+                {f.label}
+              </option>
             ))}
           </select>
 
@@ -576,43 +756,70 @@ export default function RichTextEditor(): React.ReactElement {
             step={1}
             className="w-20 mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
             value={perso.fontSize}
-            onChange={(e) => setPerso((p) => ({ ...p, fontSize: clampSize(Number(e.target.value) || 16) }))}
+            onChange={(e) =>
+              setPerso((p) => ({
+                ...p,
+                fontSize: clampSize(Number(e.target.value) || 16),
+              }))
+            }
             aria-label="Font size (px)"
           />
           <button
             type="button"
             className="px-2 py-1 mr-1 rounded-md border border-gray-300 bg-white text-sm"
-            onClick={() => setPerso((p) => ({ ...p, fontSize: clampSize(p.fontSize - 2) }))}
+            onClick={() =>
+              setPerso((p) => ({ ...p, fontSize: clampSize(p.fontSize - 2) }))
+            }
             title="Decrease font size"
-          >A-</button>
+          >
+            A-
+          </button>
           <button
             type="button"
             className="px-2 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
-            onClick={() => setPerso((p) => ({ ...p, fontSize: clampSize(p.fontSize + 2) }))}
+            onClick={() =>
+              setPerso((p) => ({ ...p, fontSize: clampSize(p.fontSize + 2) }))
+            }
             title="Increase font size"
-          >A+</button>
+          >
+            A+
+          </button>
           <input
             type="range"
             min={MIN_FONT_SIZE}
             max={MAX_FONT_SIZE}
             step={1}
             value={perso.fontSize}
-            onChange={(e) => setPerso((p) => ({ ...p, fontSize: clampSize(Number(e.target.value) || p.fontSize) }))}
+            onChange={(e) =>
+              setPerso((p) => ({
+                ...p,
+                fontSize: clampSize(Number(e.target.value) || p.fontSize),
+              }))
+            }
             className="w-40 h-2 mr-2 mb-1 cursor-pointer"
             aria-label="Font size slider"
           />
           <select
             className="mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
-            value={SIZE_PRESETS.includes(perso.fontSize) ? String(perso.fontSize) : ''}
+            value={
+              SIZE_PRESETS.includes(perso.fontSize)
+                ? String(perso.fontSize)
+                : ""
+            }
             onChange={(e) => {
               const v = Number(e.target.value);
-              if (!isNaN(v)) setPerso((p) => ({ ...p, fontSize: clampSize(v) }));
+              if (!isNaN(v))
+                setPerso((p) => ({ ...p, fontSize: clampSize(v) }));
             }}
             aria-label="Font size presets"
           >
-            <option value="" disabled>Preset</option>
+            <option value="" disabled>
+              Preset
+            </option>
             {SIZE_PRESETS.map((s) => (
-              <option key={s} value={String(s)}>{s}px</option>
+              <option key={s} value={String(s)}>
+                {s}px
+              </option>
             ))}
           </select>
 
@@ -624,43 +831,80 @@ export default function RichTextEditor(): React.ReactElement {
             step={0.1}
             className="w-20 mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
             value={perso.lineHeight}
-            onChange={(e) => setPerso((p) => ({ ...p, lineHeight: clampLine(Number(e.target.value) || p.lineHeight) }))}
+            onChange={(e) =>
+              setPerso((p) => ({
+                ...p,
+                lineHeight: clampLine(Number(e.target.value) || p.lineHeight),
+              }))
+            }
             aria-label="Line height"
           />
           <button
             type="button"
             className="px-2 py-1 mr-1 rounded-md border border-gray-300 bg-white text-sm"
-            onClick={() => setPerso((p) => ({ ...p, lineHeight: clampLine(parseFloat((p.lineHeight - 0.1).toFixed(2))) }))}
+            onClick={() =>
+              setPerso((p) => ({
+                ...p,
+                lineHeight: clampLine(
+                  parseFloat((p.lineHeight - 0.1).toFixed(2))
+                ),
+              }))
+            }
             title="Decrease line height"
-          >−</button>
+          >
+            −
+          </button>
           <button
             type="button"
             className="px-2 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
-            onClick={() => setPerso((p) => ({ ...p, lineHeight: clampLine(parseFloat((p.lineHeight + 0.1).toFixed(2))) }))}
+            onClick={() =>
+              setPerso((p) => ({
+                ...p,
+                lineHeight: clampLine(
+                  parseFloat((p.lineHeight + 0.1).toFixed(2))
+                ),
+              }))
+            }
             title="Increase line height"
-          >+</button>
+          >
+            +
+          </button>
           <input
             type="range"
             min={MIN_LINE}
             max={MAX_LINE}
             step={0.1}
             value={perso.lineHeight}
-            onChange={(e) => setPerso((p) => ({ ...p, lineHeight: clampLine(Number(e.target.value) || p.lineHeight) }))}
+            onChange={(e) =>
+              setPerso((p) => ({
+                ...p,
+                lineHeight: clampLine(Number(e.target.value) || p.lineHeight),
+              }))
+            }
             className="w-40 h-2 mr-2 mb-1 cursor-pointer"
             aria-label="Line height slider"
           />
           <select
             className="mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
-            value={LINE_PRESETS.includes(Number(perso.lineHeight.toFixed(1))) ? String(Number(perso.lineHeight.toFixed(1))) : ''}
+            value={
+              LINE_PRESETS.includes(Number(perso.lineHeight.toFixed(1)))
+                ? String(Number(perso.lineHeight.toFixed(1)))
+                : ""
+            }
             onChange={(e) => {
               const v = Number(e.target.value);
-              if (!isNaN(v)) setPerso((p) => ({ ...p, lineHeight: clampLine(v) }));
+              if (!isNaN(v))
+                setPerso((p) => ({ ...p, lineHeight: clampLine(v) }));
             }}
             aria-label="Line height presets"
           >
-            <option value="" disabled>Preset</option>
+            <option value="" disabled>
+              Preset
+            </option>
             {LINE_PRESETS.map((lh) => (
-              <option key={lh} value={String(lh)}>{lh}</option>
+              <option key={lh} value={String(lh)}>
+                {lh}
+              </option>
             ))}
           </select>
 
@@ -668,7 +912,12 @@ export default function RichTextEditor(): React.ReactElement {
           <select
             className="mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
             value={perso.pageWidth}
-            onChange={(e) => setPerso((p) => ({ ...p, pageWidth: e.target.value as Personalization["pageWidth"] }))}
+            onChange={(e) =>
+              setPerso((p) => ({
+                ...p,
+                pageWidth: e.target.value as Personalization["pageWidth"],
+              }))
+            }
           >
             <option value="narrow">Narrow</option>
             <option value="normal">Normal</option>
@@ -680,49 +929,72 @@ export default function RichTextEditor(): React.ReactElement {
               type="button"
               className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
               onClick={saveDocument}
-            >Save</button>
+            >
+              Save
+            </button>
             {savedAt && (
-              <span className="text-xs text-[var(--color-text-muted)] mr-2">Saved ✓</span>
+              <span className="text-xs text-(--color-text-muted) mr-2">
+                Saved ✓
+              </span>
             )}
             <button
               type="button"
               className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
               onClick={exportHTML}
-            >Export HTML</button>
+            >
+              Export HTML
+            </button>
             <button
               type="button"
               className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
               onClick={exportText}
-            >Export TXT</button>
+            >
+              Export TXT
+            </button>
             <button
               type="button"
               className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
               onClick={exportPng}
-            >Export PNG</button>
+            >
+              Export PNG
+            </button>
             <button
               type="button"
               className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
               onClick={exportJpeg}
-            >Export JPG</button>
+            >
+              Export JPG
+            </button>
             <button
               type="button"
               className="px-3 py-1 rounded-md border border-gray-300 bg-white text-sm"
               onClick={printSaved}
-            >Print</button>
+            >
+              Print
+            </button>
 
             <div className="w-px h-6 bg-gray-200 mx-2" />
 
             <button
               type="button"
               className="px-3 py-1 rounded-md border border-gray-300 bg-white text-sm"
-              onClick={() => setPerso((p) => ({ ...p, theme: p.theme === "light" ? "dark" : "light" }))}
-            >{perso.theme === "light" ? "Dark" : "Light"} Theme</button>
+              onClick={() =>
+                setPerso((p) => ({
+                  ...p,
+                  theme: p.theme === "light" ? "dark" : "light",
+                }))
+              }
+            >
+              {perso.theme === "light" ? "Dark" : "Light"} Theme
+            </button>
           </div>
         </div>
       </div>
 
       {/* Editor Area */}
-      <div className={`mx-auto ${wrapperMaxW} shadow-sm rounded-xl border border-[var(--card-border)] overflow-hidden`}> 
+      <div
+        className={`mx-auto ${wrapperMaxW} shadow-sm rounded-xl border border-(--card-border) overflow-hidden`}
+      >
         <div
           ref={captureRef}
           className={`${themeClasses} p-4 sm:p-6`}
@@ -730,7 +1002,10 @@ export default function RichTextEditor(): React.ReactElement {
             fontFamily: `var(${perso.fontVar})`,
           }}
         >
-          <div className="min-h-[60vh]" style={{ fontSize: perso.fontSize, lineHeight: perso.lineHeight }}>
+          <div
+            className="min-h-[60vh]"
+            style={{ fontSize: perso.fontSize, lineHeight: perso.lineHeight }}
+          >
             <EditorContent editor={editor} />
           </div>
         </div>

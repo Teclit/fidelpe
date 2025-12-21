@@ -1,6 +1,12 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
+import localFont from "next/font/local";
+
+export const tsoronaAsmara = localFont({
+  src: "../../public/fonts/Tsorona/TsoronaAsmara-Regular.ttf",
+  variable: "--font-tsorona-asmat",
+});
 
 export default function Home(): React.ReactElement {
   const [text, setText] = useState("");
@@ -20,7 +26,7 @@ export default function Home(): React.ReactElement {
   const handleProcess = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim()) {
-      setResult("[Aucun texte fourni]");
+      setResult("[No text provided]");
       return;
     }
     setLoading(true);
@@ -53,17 +59,18 @@ export default function Home(): React.ReactElement {
   return (
     <main className="space-y-4 flex flex-col min-h-full">
       <header className="text-center mb-3">
-        <h1 className="font-geez-gothic font-bold text-2xl sm:text-3xl md:text-4xl leading-tight text-(--color-primary) mb-2">
+        <h1
+          className={`${tsoronaAsmara.className} font-bold text-2xl sm:text-3xl md:text-4xl leading-tight text-(--color-primary) mb-2`}
+        >
           ፊደልፐ ምስ ጽሑፋት
         </h1>
-        <h1 className="text-xl sm:text-2xl md:text-3xl leading-tight text-(--color-primary) mb-2">
-          FidelpeExtractX — Rendre les textes faciles
+        <h1 className="text-sm sm:text-base text-(--color-primary) mb-2">
+          FidelpeExtractX — Make texts easy
         </h1>
-        <p className="m-0 text-(--color-text-muted) text-sm sm:text-base md:text-lg leading-[1.45]">
-          Cet outil est pour les personnes qui n&rsquo;utilisent pas souvent les
-          outils numériques. Copiez un texte ou importez une photo (facture,
-          lettre, note). Nous extrayons et simplifions les phrases pour que ce
-          soit plus clair.
+        <p className="m-0 text-(--color-text-muted) text-xs sm:text-base md:text-lg leading-[1.45]">
+          This tool is for people who don&rsquo;t often use digital tools. Copy
+          a text or import a photo (invoice, letter, note). We extract and
+          simplify sentences to make them clearer.
         </p>
       </header>
 
@@ -72,14 +79,14 @@ export default function Home(): React.ReactElement {
           htmlFor="text"
           className="block font-bold text-(--color-primary) mb-[0.6rem] text-[0.98rem]"
         >
-          Votre texte ou image
+          Your text or image
         </label>
 
         <textarea
           id="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Collez le texte ici ou importez une photo/scan."
+          placeholder="Paste text here or import a photo/scan."
           className="w-full min-h-48 sm:min-h-56 p-3 sm:p-[0.9rem] rounded-xl border border-[rgba(54,41,37,0.12)] bg-white text-(--color-text-dark) resize-y shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] text-sm sm:text-base focus:outline focus:outline-[rgba(133,88,50,0.12)] focus:border-(--color-accent-cta)"
         />
 
@@ -91,7 +98,7 @@ export default function Home(): React.ReactElement {
               onChange={handleFileChange}
               className="hidden"
             />
-            📁 Importer une photo / un scan
+            📁 Import a photo / scan
           </label>
 
           <div className="flex gap-2 w-full sm:w-auto">
@@ -100,14 +107,14 @@ export default function Home(): React.ReactElement {
               disabled={loading}
               className="inline-flex items-center justify-center gap-[0.6rem] py-3 px-4 rounded-xl font-bold cursor-pointer border-0 text-[0.98rem] bg-linear-to-b from-(--color-accent-cta) to-(--color-accent) text-white shadow-[0_8px_22px_rgba(133,88,50,0.12)] focus:outline focus:outline-[rgba(133,88,50,0.14)] disabled:opacity-60 disabled:cursor-not-allowed w-full sm:w-auto"
             >
-              {loading ? "Traitement..." : "Simplifier"}
+              {loading ? "Processing..." : "Simplify"}
             </button>
             <button
               type="button"
               onClick={handleReset}
               className="inline-flex items-center justify-center gap-[0.6rem] py-3 px-4 rounded-xl font-bold cursor-pointer text-[0.98rem] bg-white text-(--color-primary) border border-[rgba(17,24,39,0.06)] disabled:opacity-60 disabled:cursor-not-allowed w-full sm:w-auto"
             >
-              Réinitialiser
+              Reset
             </button>
           </div>
         </div>
@@ -116,15 +123,13 @@ export default function Home(): React.ReactElement {
       {result && (
         <section className="mt-4 sm:mt-5">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-(--color-primary)">Texte simplifié</h2>
+            <h2 className="text-(--color-primary)">Simplified text</h2>
             <button
               onClick={handleCopy}
               className={`inline-flex items-center gap-2 py-2 px-3 rounded-[10px] font-bold text-white ${
-                copied
-                  ? "bg-(--color-primary-two)"
-                  : "bg-(--color-accent)"
+                copied ? "bg-(--color-primary-two)" : "bg-(--color-accent)"
               }`}
-              aria-label={copied ? "Copié" : "Copier"}
+              aria-label={copied ? "Copied" : "Copy"}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -142,7 +147,7 @@ export default function Home(): React.ReactElement {
                 <rect x="9" y="9" width="11" height="11" rx="2" />
                 <path d="M5 15V5a2 2 0 0 1 2-2h10" />
               </svg>
-              {copied ? "Copié !" : "Copier"}
+              {copied ? "Copied!" : "Copy"}
             </button>
           </div>
 
@@ -153,8 +158,8 @@ export default function Home(): React.ReactElement {
       )}
 
       <footer className="text-center text-(--color-text-muted) text-[0.95rem] mt-auto">
-        © {new Date().getFullYear()} FidelpeExtractX — Pour les personnes peu à
-        l&rsquo;aise avec le numérique.
+        © {new Date().getFullYear()} FidelpeExtractX — For people not
+        comfortable with digital technology.
       </footer>
     </main>
   );

@@ -80,7 +80,7 @@ export default function Home(): React.ReactElement {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Collez le texte ici ou importez une photo/scan."
-          className="w-full min-h-48 sm:min-h-56 p-3 sm:p-[0.9rem] rounded-xl border border-[rgba(54,41,37,0.12)] bg-white text-(--color-text-dark) resize-y shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] text-sm sm:text-base focus:outline focus:outline-[3px] focus:outline-[rgba(133,88,50,0.12)] focus:border-[var(--color-accent-cta)]"
+          className="w-full min-h-48 sm:min-h-56 p-3 sm:p-[0.9rem] rounded-xl border border-[rgba(54,41,37,0.12)] bg-white text-(--color-text-dark) resize-y shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] text-sm sm:text-base focus:outline focus:outline-[rgba(133,88,50,0.12)] focus:border-(--color-accent-cta)"
         />
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-3">
@@ -98,7 +98,7 @@ export default function Home(): React.ReactElement {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center justify-center gap-[0.6rem] py-3 px-4 rounded-xl font-bold cursor-pointer border-0 text-[0.98rem] bg-linear-to-b from-[var(--color-accent-cta)] to-[var(--color-accent)] text-white shadow-[0_8px_22px_rgba(133,88,50,0.12)] focus:outline focus:outline-[3px] focus:outline-[rgba(133,88,50,0.14)] disabled:opacity-60 disabled:cursor-not-allowed w-full sm:w-auto"
+              className="inline-flex items-center justify-center gap-[0.6rem] py-3 px-4 rounded-xl font-bold cursor-pointer border-0 text-[0.98rem] bg-linear-to-b from-(--color-accent-cta) to-(--color-accent) text-white shadow-[0_8px_22px_rgba(133,88,50,0.12)] focus:outline focus:outline-[rgba(133,88,50,0.14)] disabled:opacity-60 disabled:cursor-not-allowed w-full sm:w-auto"
             >
               {loading ? "Traitement..." : "Simplifier"}
             </button>

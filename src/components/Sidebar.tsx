@@ -72,6 +72,13 @@ export default function Sidebar(): React.ReactElement {
               >
                 Editor
               </Link>
+              <Link
+                href="/aetd"
+                className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
+                onClick={close}
+              >
+                AETD Dictionary
+              </Link>
             </nav>
             <div className="mt-auto w-full text-center border-t border-gray-200 pt-4 text-xs text-(--color-text-muted)">
               © {new Date().getFullYear()}
@@ -83,7 +90,11 @@ export default function Sidebar(): React.ReactElement {
       {/* Desktop: persistent sidebar */}
       <aside className="hidden md:flex md:basis-[20%] shrink-0 bg-white/80 border-r border-gray-200/70 sticky top-0 h-screen p-4 text-(--color-text-dark) flex-col justify-start items-stretch">
         <div className="mb-4">
-          <h2 className="font-bold text-(--color-primary)">ፊደልፐ ምስ ጽሑፋት</h2>
+          <h2
+            className={`${tsoronaAsmara.className} font-bold text-(--color-primary)`}
+          >
+            ፊደልፐ ምስ ጽሑፋት
+          </h2>
         </div>
         <nav className="space-y-4 w-full mb-4">
           <Link
@@ -103,6 +114,12 @@ export default function Sidebar(): React.ReactElement {
             className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
           >
             Editor
+          </Link>
+          <Link
+            href="/aetd"
+            className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
+          >
+            AETD Dictionary
           </Link>
         </nav>
         <div className="mt-auto w-full text-center border-t border-gray-200/70 pt-4 text-xs text-(--color-text-muted)">

@@ -60,20 +60,45 @@ export default function AetdPage(): React.ReactElement {
     if (!entries || query.trim().length === 0) return [];
     const term = query.trim().toLowerCase();
 
+    const getRank = (item: DictionaryEntry): number => {
+      const entryText = item.entry?.toLowerCase() ?? "";
+      const defText = item.def?.toLowerCase() ?? "";
+      const partText = item.partofsp?.toLowerCase() ?? "";
+      const pronText = item.pronunc?.toLowerCase() ?? "";
+
+      // Prioritize headwords that start with the search term, then other fields.
+      if (entryText.startsWith(term)) return 0;
+      if (defText.startsWith(term)) return 1;
+      if (partText.startsWith(term) || pronText.startsWith(term)) return 2;
+      if (entryText.includes(term)) return 3;
+      if (defText.includes(term)) return 4;
+      if (partText.includes(term) || pronText.includes(term)) return 5;
+      return 6;
+    };
+
     return entries
-      .filter((item) => {
+      .map((item) => {
         const entryText = item.entry?.toLowerCase() ?? "";
         const defText = item.def?.toLowerCase() ?? "";
         const partText = item.partofsp?.toLowerCase() ?? "";
         const pronText = item.pronunc?.toLowerCase() ?? "";
-        return (
+        const matches =
           entryText.includes(term) ||
           defText.includes(term) ||
           partText.includes(term) ||
-          pronText.includes(term)
-        );
+          pronText.includes(term);
+
+        return matches ? { item, rank: getRank(item) } : null;
       })
-      .slice(0, maxResults);
+      .filter((v): v is { item: DictionaryEntry; rank: number } => v !== null)
+      .sort((a, b) => {
+        if (a.rank !== b.rank) return a.rank - b.rank;
+        const aEntry = a.item.entry ?? "";
+        const bEntry = b.item.entry ?? "";
+        return aEntry.localeCompare(bEntry);
+      })
+      .slice(0, maxResults)
+      .map((wrapped) => wrapped.item);
   }, [entries, maxResults, query]);
 
   const showEmptyState = query.trim().length < 2;

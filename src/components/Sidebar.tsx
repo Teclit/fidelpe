@@ -101,25 +101,25 @@ export default function Sidebar(): React.ReactElement {
             href="/"
             className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
           >
-            Accueil
-          </Link>
-          <Link
-            href="/fonts-demo"
-            className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
-          >
-            Fonts demo
-          </Link>
-          <Link
-            href="/editor"
-            className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
-          >
-            Editor
+            Home
           </Link>
           <Link
             href="/aetd"
             className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
           >
             AETD Dictionary
+          </Link>
+          <Link
+            href="/fonts-demo"
+            className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
+          >
+            Fonts
+          </Link>
+          <Link
+            href="/editor"
+            className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
+          >
+            Editor
           </Link>
         </nav>
         <div className="mt-auto w-full text-center border-t border-gray-200/70 pt-4 text-xs text-(--color-text-muted)">

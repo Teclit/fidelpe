@@ -91,7 +91,7 @@ export default function Sidebar(): React.ReactElement {
       <aside className="hidden md:flex md:basis-[20%] shrink-0 bg-white/80 border-r border-gray-200/70 sticky top-0 h-screen p-4 text-(--color-text-dark) flex-col justify-start items-stretch">
         <div className="mb-4">
           <h2
-            className={`${tsoronaAsmara.className} font-bold text-(--color-primary)`}
+            className={`${tsoronaAsmara.className} text-3xl font-bold text-(--color-primary)`}
           >
             ፊደልፐ ምስ ጽሑፋት
           </h2>
@@ -123,7 +123,19 @@ export default function Sidebar(): React.ReactElement {
           </Link>
         </nav>
         <div className="mt-auto w-full text-center border-t border-gray-200/70 pt-4 text-xs text-(--color-text-muted)">
-          © {new Date().getFullYear()}
+          <p className="mb-2">
+            © FidelPE Asmara 2023 - {new Date().getFullYear()}.
+          </p>
+          <p className="flex items-center justify-center gap-1 text-gray-400">
+            Made with
+            <svg
+              className="w-3.5 h-3.5 text-red-500 fill-current"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+            and code
+          </p>
         </div>
       </aside>
     </>

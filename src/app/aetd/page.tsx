@@ -13,6 +13,7 @@ type DictionaryEntry = {
 };
 
 const DATA_URL = "/EnglishTigrigna/AdvancedEnglishTigrinyaDictionary.json";
+type SearchScope = "headword" | "all";
 
 export default function AetdPage(): React.ReactElement {
   const [query, setQuery] = useState("");
@@ -21,6 +22,9 @@ export default function AetdPage(): React.ReactElement {
   const [error, setError] = useState("");
   const [maxResults, setMaxResults] = useState(30);
   const [hasSearched, setHasSearched] = useState(false);
+  const [searchScope, setSearchScope] = useState<SearchScope>("headword");
+  const [prefixOnly, setPrefixOnly] = useState(true);
+  const totalEntries = entries?.length ?? 0;
 
   const loadDictionary = useCallback(async () => {
     if (entries || loadingData) return;
@@ -60,33 +64,45 @@ export default function AetdPage(): React.ReactElement {
     if (!entries || query.trim().length === 0) return [];
     const term = query.trim().toLowerCase();
 
-    const getRank = (item: DictionaryEntry): number => {
-      const entryText = item.entry?.toLowerCase() ?? "";
-      const defText = item.def?.toLowerCase() ?? "";
-      const partText = item.partofsp?.toLowerCase() ?? "";
-      const pronText = item.pronunc?.toLowerCase() ?? "";
+    const normalize = (value?: string): string => value?.toLowerCase() ?? "";
 
-      // Prioritize headwords that start with the search term, then other fields.
+    const getRank = (item: DictionaryEntry): number => {
+      const entryText = normalize(item.entry);
+      const defText = normalize(item.def);
+      const partText = normalize(item.partofsp);
+      const pronText = normalize(item.pronunc);
+
+      if (searchScope === "headword") {
+        if (entryText.startsWith(term)) return 0;
+        if (!prefixOnly && entryText.includes(term)) return 1;
+        return 6;
+      }
+
       if (entryText.startsWith(term)) return 0;
       if (defText.startsWith(term)) return 1;
       if (partText.startsWith(term) || pronText.startsWith(term)) return 2;
-      if (entryText.includes(term)) return 3;
-      if (defText.includes(term)) return 4;
-      if (partText.includes(term) || pronText.includes(term)) return 5;
+      if (!prefixOnly && entryText.includes(term)) return 3;
+      if (!prefixOnly && defText.includes(term)) return 4;
+      if (!prefixOnly && (partText.includes(term) || pronText.includes(term)))
+        return 5;
       return 6;
     };
 
     return entries
       .map((item) => {
-        const entryText = item.entry?.toLowerCase() ?? "";
-        const defText = item.def?.toLowerCase() ?? "";
-        const partText = item.partofsp?.toLowerCase() ?? "";
-        const pronText = item.pronunc?.toLowerCase() ?? "";
-        const matches =
-          entryText.includes(term) ||
-          defText.includes(term) ||
-          partText.includes(term) ||
-          pronText.includes(term);
+        const entryText = normalize(item.entry);
+        const defText = normalize(item.def);
+        const partText = normalize(item.partofsp);
+        const pronText = normalize(item.pronunc);
+
+        const scopeFields =
+          searchScope === "headword"
+            ? [entryText]
+            : [entryText, defText, partText, pronText];
+
+        const matches = scopeFields.some((field) =>
+          prefixOnly ? field.startsWith(term) : field.includes(term)
+        );
 
         return matches ? { item, rank: getRank(item) } : null;
       })
@@ -99,7 +115,7 @@ export default function AetdPage(): React.ReactElement {
       })
       .slice(0, maxResults)
       .map((wrapped) => wrapped.item);
-  }, [entries, maxResults, query]);
+  }, [entries, maxResults, prefixOnly, query, searchScope]);
 
   const showEmptyState = query.trim().length < 2;
 
@@ -116,10 +132,15 @@ export default function AetdPage(): React.ReactElement {
             </h1>
             <p className="text-(--color-text-muted) mt-2 text-sm sm:text-base leading-relaxed">
               Search the offline dictionary for quick English ⇄ Tigrinya
-              lookups. Data loads on first search and stays in memory.
+              lookups. Data loads on first search (≈8 MB) and stays in memory.
             </p>
           </div>
-          <div className="flex gap-3 flex-wrap text-sm text-(--color-text-muted)">
+          <div className="flex gap-3 flex-wrap text-sm text-(--color-text-muted) items-center">
+            {entries && (
+              <span className="px-3 py-2 rounded-xl bg-(--color-secondary) border border-[rgba(17,24,39,0.06)]">
+                {totalEntries.toLocaleString()} entries loaded
+              </span>
+            )}
             <Link
               href="/EnglishTigrigna/help.html"
               target="_blank"
@@ -171,6 +192,59 @@ export default function AetdPage(): React.ReactElement {
           </div>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-(--color-text-dark)">
+          <div className="flex flex-col gap-2 rounded-xl border border-[rgba(17,24,39,0.08)] bg-(--color-secondary) p-3">
+            <p className="font-semibold text-(--color-primary)">Search scope</p>
+            <div className="flex flex-wrap gap-3">
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="scope"
+                  value="headword"
+                  checked={searchScope === "headword"}
+                  onChange={() => setSearchScope("headword")}
+                />
+                Headwords only (fastest)
+              </label>
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="scope"
+                  value="all"
+                  checked={searchScope === "all"}
+                  onChange={() => setSearchScope("all")}
+                />
+                All fields (definitions, part of speech, pronunciation)
+              </label>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 rounded-xl border border-[rgba(17,24,39,0.08)] bg-(--color-secondary) p-3">
+            <p className="font-semibold text-(--color-primary)">Match type</p>
+            <div className="flex flex-wrap gap-3">
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="match"
+                  value="prefix"
+                  checked={prefixOnly}
+                  onChange={() => setPrefixOnly(true)}
+                />
+                Starts with (recommended)
+              </label>
+              <label className="inline-flex items-center gap-2 cursor-pointer">
+                <input
+                  type="radio"
+                  name="match"
+                  value="contains"
+                  checked={!prefixOnly}
+                  onChange={() => setPrefixOnly(false)}
+                />
+                Contains anywhere
+              </label>
+            </div>
+          </div>
+        </div>
+
         <div className="flex items-center gap-3 text-sm text-(--color-text-muted)">
           <span className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-(--color-secondary) border border-[rgba(17,24,39,0.06)]">
             {loadingData
@@ -190,6 +264,14 @@ export default function AetdPage(): React.ReactElement {
           {!hasSearched && showEmptyState && (
             <span>Type at least 2 characters to start searching.</span>
           )}
+          {!loadingData && entries && !error && (
+            <span>
+              Scope:{" "}
+              {searchScope === "headword" ? "Headwords only" : "All fields"},{" "}
+              {prefixOnly ? "starts with" : "contains"}{" "}
+              {query.trim() && <span>“{query.trim()}”</span>}
+            </span>
+          )}
         </div>
       </div>
 
@@ -199,7 +281,7 @@ export default function AetdPage(): React.ReactElement {
             Results
           </h2>
           <div className="text-sm text-(--color-text-muted)">
-            {filteredEntries.length} shown
+            {filteredEntries.length} of {totalEntries.toLocaleString()} shown
           </div>
         </div>
 

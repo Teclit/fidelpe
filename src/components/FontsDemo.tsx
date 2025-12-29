@@ -47,11 +47,13 @@ export default function FontsDemo() {
 
     Promise.all([
       fetch("/fonts.min.json").then((res) => {
-        if (!res.ok) throw new Error(`Failed to fetch fonts.min.json: ${res.status}`);
+        if (!res.ok)
+          throw new Error(`Failed to fetch fonts.min.json: ${res.status}`);
         return res.json();
       }),
       fetch("/city_name.json").then((res) => {
-        if (!res.ok) throw new Error(`Failed to fetch city_name.json: ${res.status}`);
+        if (!res.ok)
+          throw new Error(`Failed to fetch city_name.json: ${res.status}`);
         return res.json();
       }),
     ])
@@ -164,7 +166,9 @@ export default function FontsDemo() {
     return (
       <div className="p-8 max-w-7xl mx-auto">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-          <h2 className="text-red-800 font-semibold mb-2">Error Loading Fonts</h2>
+          <h2 className="text-red-800 font-semibold mb-2">
+            Error Loading Fonts
+          </h2>
           <p className="text-red-600">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -198,7 +202,25 @@ export default function FontsDemo() {
           Geez Fonts Demonstration
         </h1>
         <p className="text-gray-600">
-          Preview {fonts.length} fonts organized by {cities.length} cities. Sources loaded from fonts.min.json.
+          Explore {fonts.length} fonts for
+          <span className="text-[#418FDE] text-2xl font-bold italic">
+            {" "}
+            Geez,
+          </span>
+          <span className="text-[#FFC72C] text-2xl font-bold italic">
+            {" "}
+            Tigre,
+          </span>
+          <span className="text-[#E4002B] text-2xl font-bold italic">
+            {" "}
+            Tigrinya,
+          </span>
+          and
+          <span className="text-[#43B02A] text-2xl font-bold italic">
+            {" "}
+            Amharic{" "}
+          </span>
+          languages from {cities.length} different cities.
         </p>
       </div>
 

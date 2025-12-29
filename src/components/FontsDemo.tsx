@@ -199,10 +199,10 @@ export default function FontsDemo() {
     <div className="p-8 max-w-7xl mx-auto">
       <div className="mb-8 text-center">
         <h1 className="text-4xl font-bold mb-3 text-gray-900">
-          Geez Fonts Demonstration
+          Geez Fonts for Your Projects
         </h1>
         <p className="text-gray-600">
-          Explore {fonts.length} fonts for
+          Try, preview, and download {fonts.length} fonts for
           <span className="text-[#418FDE] text-2xl font-bold italic">
             {" "}
             Geez,
@@ -220,7 +220,8 @@ export default function FontsDemo() {
             {" "}
             Amharic{" "}
           </span>
-          languages from {cities.length} different cities.
+          languages from {cities.length} different cities. All fonts here are
+          free to try and download for non-profit use.
         </p>
       </div>
 
@@ -328,7 +329,7 @@ export default function FontsDemo() {
               />
             </svg>
             <span className="text-lg font-semibold text-gray-900">
-              Dropdown & controls
+              Choose your font & preview text
             </span>
           </div>
         </summary>
@@ -341,7 +342,7 @@ export default function FontsDemo() {
                   htmlFor="citySelect"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  City:
+                  Font Group:
                 </label>
                 <select
                   id="citySelect"
@@ -453,7 +454,7 @@ export default function FontsDemo() {
               />
             </svg>
             <span className="text-lg font-semibold text-gray-900">
-              Preview grid for selected city
+              Browse & download fonts by city
             </span>
           </div>
           {selectedCity && (
@@ -466,7 +467,7 @@ export default function FontsDemo() {
         {openAccordions.grid && (
           <div className="p-4 pt-0 border-t border-gray-100">
             <div className="mb-4 text-lg font-semibold text-gray-700">
-              City: {getCityLabel(selectedCity)} ({selectedCity})
+              Font Group: {getCityLabel(selectedCity)} ({selectedCity})
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -494,6 +495,9 @@ export default function FontsDemo() {
                       >
                         Download
                       </a>
+                    </div>
+                    <div className="text-[11px] text-gray-500 mb-2">
+                      Free for non-profit use; preview live before you download.
                     </div>
                     <div
                       className="text-xl text-gray-900 wrap-break-word"

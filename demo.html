@@ -1,34 +1,54 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Geez Fonts Demo — "ሰላም"</title>
     <!-- External stylesheet -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="container">
       <div class="header">
         <h1>Geez Fonts Demonstration</h1>
-        <p>Preview “ሰላም” via accordion and dropdown. Sources are loaded from <code>fonts/</code> according to <code>fonts.min.json</code>.</p>
+        <p>
+          Preview “ሰላም” via accordion and dropdown. Sources are loaded from
+          <code>fonts/</code> according to <code>fonts.min.json</code>.
+        </p>
       </div>
 
       <details open>
         <summary>
           Quick preview by families
-          <svg class="chevron" width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M5 8l5 5 5-5" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg
+            class="chevron"
+            width="18"
+            height="18"
+            viewBox="0 0 20 20"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M5 8l5 5 5-5"
+              stroke="#9ca3af"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </summary>
         <div class="panel">
           <div class="sample-grid" id="quickGrid">
             <div class="card">
-              <div class="label"><span class="dot"></span><span>Asmara Sans Geez</span></div>
+              <div class="label">
+                <span class="dot"></span><span>Asmara Sans Geez</span>
+              </div>
               <div class="word asmara-sans">ሰላም</div>
             </div>
             <div class="card">
-              <div class="label"><span class="dot"></span><span>Asmara Serif Geez</span></div>
+              <div class="label">
+                <span class="dot"></span><span>Asmara Serif Geez</span>
+              </div>
               <div class="word asmara-serif">ሰላም</div>
             </div>
           </div>
@@ -38,8 +58,21 @@
       <details>
         <summary>
           Dropdown & controls
-          <svg class="chevron" width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M5 8l5 5 5-5" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg
+            class="chevron"
+            width="18"
+            height="18"
+            viewBox="0 0 20 20"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M5 8l5 5 5-5"
+              stroke="#9ca3af"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </summary>
         <div class="panel">
@@ -59,9 +92,22 @@
 
       <details>
         <summary>
-          Preview grid for selected city
-          <svg class="chevron" width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M5 8l5 5 5-5" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          Browse & download fonts by city
+          <svg
+            class="chevron"
+            width="18"
+            height="18"
+            viewBox="0 0 20 20"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M5 8l5 5 5-5"
+              stroke="#9ca3af"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </summary>
         <div class="panel">
@@ -74,29 +120,29 @@
     <script>
       // Load fonts configuration
       async function loadFontsConfig() {
-        const res = await fetch('fonts.min.json');
-        if (!res.ok) throw new Error('Failed to load fonts.min.json');
+        const res = await fetch("fonts.min.json");
+        if (!res.ok) throw new Error("Failed to load fonts.min.json");
         const json = await res.json();
         return json.fonts || [];
       }
 
       // Load city names map EN -> TI
       async function loadCityNames() {
-        const res = await fetch('city_name.json');
-        if (!res.ok) throw new Error('Failed to load city_name.json');
+        const res = await fetch("city_name.json");
+        if (!res.ok) throw new Error("Failed to load city_name.json");
         return await res.json(); // { EnglishCity: "ትግርኛ" }
       }
 
       // Dynamically inject @font-face rule
       function injectFontFace(faceName, ttfPath) {
-        const style = document.createElement('style');
+        const style = document.createElement("style");
         style.textContent = `@font-face { font-family: "${faceName}"; src: url('${ttfPath}') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }`;
         document.head.appendChild(style);
       }
 
       function sanitizeName(str) {
         // Generate a safe CSS font-family name from path or full name
-        return 'Geez_' + str.replace(/[^a-zA-Z0-9_\-]/g, '_');
+        return "Geez_" + str.replace(/[^a-zA-Z0-9_\-]/g, "_");
       }
 
       // Populate city dropdown (labels in Tigrigna) and fonts for selection
@@ -106,12 +152,12 @@
           if (!byCity.has(f.city)) byCity.set(f.city, []);
           byCity.get(f.city).push(f);
         }
-        const citySelect = document.getElementById('citySelect');
-        citySelect.innerHTML = '';
+        const citySelect = document.getElementById("citySelect");
+        citySelect.innerHTML = "";
         // Sort by English city but display Tigrigna if available
         const englishCities = Array.from(byCity.keys()).sort();
         for (const en of englishCities) {
-          const opt = document.createElement('option');
+          const opt = document.createElement("option");
           opt.value = en; // internal English value for logic
           const tigLabel = cityMap?.[en] || en; // Tigrigna label if known
           opt.textContent = tigLabel;
@@ -120,55 +166,60 @@
         // Populate fonts for the first city
         const firstCity = citySelect.value || citySelect.options[0]?.value;
         updateFontSelect(byCity, firstCity, cityMap);
-        citySelect.addEventListener('change', () => {
+        citySelect.addEventListener("change", () => {
           updateFontSelect(byCity, citySelect.value, cityMap);
         });
         return byCity;
       }
 
       function updateFontSelect(byCity, city, cityMap) {
-        const fontSelect = document.getElementById('fontSelect');
-        const livePreview = document.getElementById('livePreview');
-        const cityTitle = document.getElementById('cityTitle');
-        const cityGrid = document.getElementById('cityGrid');
-        fontSelect.innerHTML = '';
-        const tig = cityMap?.[city] || city || '';
-        cityTitle.textContent = city ? `City: ${tig} (${city})` : '';
-        cityGrid.innerHTML = '';
+        const fontSelect = document.getElementById("fontSelect");
+        const livePreview = document.getElementById("livePreview");
+        const cityTitle = document.getElementById("cityTitle");
+        const cityGrid = document.getElementById("cityGrid");
+        fontSelect.innerHTML = "";
+        const tig = cityMap?.[city] || city || "";
+        cityTitle.textContent = city ? `City: ${tig} (${city})` : "";
+        cityGrid.innerHTML = "";
         const list = byCity.get(city) || [];
         for (const f of list) {
           // Unique face name based on file name
-          const face = sanitizeName((f.file || f.path || '').toString().replace(/\.ttf$/i, ''));
+          const face = sanitizeName(
+            (f.file || f.path || "").toString().replace(/\.ttf$/i, "")
+          );
           if (f.path) {
             injectFontFace(face, f.path);
           }
           // Option in font select
-          const opt = document.createElement('option');
+          const opt = document.createElement("option");
           opt.value = face;
           opt.textContent = f.family || f.full_name || f.file || face;
           fontSelect.appendChild(opt);
           // Card in the grid
-          const card = document.createElement('div');
-          card.className = 'card';
+          const card = document.createElement("div");
+          card.className = "card";
           // Header label + download button
-          const label = document.createElement('div');
-          label.className = 'label';
-          const left = document.createElement('div');
-          left.style.display = 'flex'; left.style.alignItems = 'center'; left.style.gap = '.5rem';
+          const label = document.createElement("div");
+          label.className = "label";
+          const left = document.createElement("div");
+          left.style.display = "flex";
+          left.style.alignItems = "center";
+          left.style.gap = ".5rem";
           left.innerHTML = `<span class="dot"></span><span>${opt.textContent}</span>`;
-          const dl = document.createElement('a');
-          dl.className = 'download-btn';
-          dl.href = f.path || '#';
-          dl.setAttribute('download', f.file || 'font.ttf');
-          dl.textContent = 'Download';
+          const dl = document.createElement("a");
+          dl.className = "download-btn";
+          dl.href = f.path || "#";
+          dl.setAttribute("download", f.file || "font.ttf");
+          dl.textContent = "Download";
           label.appendChild(left);
           label.appendChild(dl);
           card.appendChild(label);
           // Sample word
-          const word = document.createElement('div');
-          word.className = 'word font-sample';
+          const word = document.createElement("div");
+          word.className = "word font-sample";
           word.style.fontFamily = `'${face}', system-ui, sans-serif`;
-          word.textContent = document.getElementById('textInput').value || 'ሰላም';
+          word.textContent =
+            document.getElementById("textInput").value || "ሰላም";
           card.appendChild(word);
           cityGrid.appendChild(card);
         }
@@ -180,25 +231,28 @@
       }
 
       function wirePreview() {
-        const fontSelect = document.getElementById('fontSelect');
-        const livePreview = document.getElementById('livePreview');
-        const textInput = document.getElementById('textInput');
-        fontSelect.addEventListener('change', () => {
+        const fontSelect = document.getElementById("fontSelect");
+        const livePreview = document.getElementById("livePreview");
+        const textInput = document.getElementById("textInput");
+        fontSelect.addEventListener("change", () => {
           const face = fontSelect.value;
           livePreview.style.fontFamily = `'${face}', system-ui, sans-serif`;
         });
-        textInput.addEventListener('input', () => {
-          livePreview.textContent = textInput.value || 'ሰላም';
+        textInput.addEventListener("input", () => {
+          livePreview.textContent = textInput.value || "ሰላም";
           // Update all grid cards
-          document.querySelectorAll('#cityGrid .font-sample').forEach(el => {
-            el.textContent = textInput.value || 'ሰላም';
+          document.querySelectorAll("#cityGrid .font-sample").forEach((el) => {
+            el.textContent = textInput.value || "ሰላም";
           });
         });
       }
 
       (async function init() {
         try {
-          const [fonts, cityMap] = await Promise.all([loadFontsConfig(), loadCityNames()]);
+          const [fonts, cityMap] = await Promise.all([
+            loadFontsConfig(),
+            loadCityNames(),
+          ]);
           const byCity = populateCityAndFonts(fonts, cityMap);
           wirePreview();
         } catch (err) {
@@ -208,4 +262,3 @@
     </script>
   </body>
 </html>
-

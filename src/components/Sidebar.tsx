@@ -59,6 +59,20 @@ export default function Sidebar(): React.ReactElement {
                 Accueil
               </Link>
               <Link
+                href="/learn-tigrinya"
+                className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
+                onClick={close}
+              >
+                Learn Tigrinya
+              </Link>
+              <Link
+                href="/aetd"
+                className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
+                onClick={close}
+              >
+                AETD Dictionary
+              </Link>
+              <Link
                 href="/fonts-demo"
                 className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
                 onClick={close}
@@ -71,13 +85,6 @@ export default function Sidebar(): React.ReactElement {
                 onClick={close}
               >
                 Editor
-              </Link>
-              <Link
-                href="/aetd"
-                className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
-                onClick={close}
-              >
-                AETD Dictionary
               </Link>
             </nav>
             <div className="mt-auto w-full text-center border-t border-gray-200 pt-4 text-xs text-(--color-text-muted)">
@@ -102,6 +109,12 @@ export default function Sidebar(): React.ReactElement {
             className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
           >
             Home
+          </Link>
+          <Link
+            href="/learn-tigrinya"
+            className="block rounded-md px-3 py-2 hover:bg-(--color-secondary) text-sm"
+          >
+            Learn Tigrinya
           </Link>
           <Link
             href="/aetd"

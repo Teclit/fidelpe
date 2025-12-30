@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { tigrinyaAlphabet, type TigrinyaCharacter } from "@/data/tigrinya";
+import { geezAlphabet, type GeezCharacter } from "@/data/geez";
 
 type ViewMode = "carousel" | "grid";
 
 const AUTO_ADVANCE_MS = 5000;
 
 export default function TigrinyaAlphabet(): React.ReactElement {
-  const alphabetRows = useMemo<TigrinyaCharacter[]>(
-    () => [...tigrinyaAlphabet].sort((a, b) => a.order - b.order),
+  const alphabetRows = useMemo<GeezCharacter[]>(
+    () => [...geezAlphabet].sort((a, b) => a.order - b.order),
     []
   );
   const [view, setView] = useState<ViewMode>("carousel");
@@ -33,11 +33,11 @@ export default function TigrinyaAlphabet(): React.ReactElement {
     setIndex((prev) => (prev + 1) % alphabetRows.length);
   };
 
-  const renderRow = (row: TigrinyaCharacter, large = false) => (
+  const renderRow = (row: GeezCharacter, large = false) => (
     <div
       className={`flex flex-wrap justify-center gap-3 ${large ? "mt-4" : ""}`}
     >
-      {row.tigrinya.map((char, charIndex) => (
+      {row.geez.map((char, charIndex) => (
         <div
           key={`${row.phoneticGroup}-${char}-${charIndex}`}
           className={`flex flex-col items-center rounded-xl bg-white border border-[rgba(17,24,39,0.06)] shadow-sm ${

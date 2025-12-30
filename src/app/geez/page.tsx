@@ -29,7 +29,7 @@ export default function GeezPage(): React.ReactElement {
             every symbol.
           </p>
           <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-(--color-secondary) border border-(--card-border)">
-            <span className="text-(--color-primary)">ፊደል፣ ትግርኛ፡ ኣብ ምስልና ቀሊል ምምሃር</span>
+            <span className="text-(--color-primary)">ፊደል፣ ትግርኛ</span>
           </div>
         </div>
       </section>

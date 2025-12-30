@@ -7,13 +7,10 @@ type ViewMode = "carousel" | "grid";
 
 const AUTO_ADVANCE_MS = 5000;
 
-const ethiopicFontStack =
-  "'Noto Sans Ethiopic', 'Geez Able', 'Abyssinica SIL', 'Arial', sans-serif";
-
 export default function TigrinyaAlphabet(): React.ReactElement {
   const alphabetRows = useMemo<TigrinyaCharacter[]>(
     () => [...tigrinyaAlphabet].sort((a, b) => a.order - b.order),
-    [],
+    []
   );
   const [view, setView] = useState<ViewMode>("carousel");
   const [index, setIndex] = useState(0);
@@ -37,7 +34,9 @@ export default function TigrinyaAlphabet(): React.ReactElement {
   };
 
   const renderRow = (row: TigrinyaCharacter, large = false) => (
-    <div className={`flex flex-wrap justify-center gap-3 ${large ? "mt-4" : ""}`}>
+    <div
+      className={`flex flex-wrap justify-center gap-3 ${large ? "mt-4" : ""}`}
+    >
       {row.tigrinya.map((char, charIndex) => (
         <div
           key={`${row.phoneticGroup}-${char}-${charIndex}`}
@@ -46,14 +45,17 @@ export default function TigrinyaAlphabet(): React.ReactElement {
           } transition-transform duration-200 ease-out hover:-translate-y-1 hover:shadow-md`}
         >
           <span
-            className={`${large ? "text-3xl" : "text-2xl"} font-semibold text-(--color-primary)`}
-            style={{ fontFamily: ethiopicFontStack }}
+            className={`${
+              large ? "text-3xl" : "text-2xl"
+            } font-semibold text-(--color-primary)`}
           >
             {char}
           </span>
           {row.latinTransliteration[charIndex] ? (
             <span
-              className={`${large ? "text-sm" : "text-xs"} text-(--color-text-muted) mt-1`}
+              className={`${
+                large ? "text-sm" : "text-xs"
+              } text-(--color-text-muted) mt-1`}
             >
               {row.latinTransliteration[charIndex]}
             </span>
@@ -72,13 +74,12 @@ export default function TigrinyaAlphabet(): React.ReactElement {
           </p>
           <h2
             className="text-2xl sm:text-3xl font-bold text-(--color-primary)"
-            style={{ fontFamily: ethiopicFontStack }}
           >
             ፊደል፡ ትግርኛ
           </h2>
           <p className="text-(--color-text-muted) text-sm sm:text-base">
-            Toggle between a slow carousel to focus on each phonetic group or a full
-            grid to scan and compare all rows at once.
+            Toggle between a slow carousel to focus on each phonetic group or a
+            full grid to scan and compare all rows at once.
           </p>
         </div>
         <div className="flex gap-2">
@@ -123,11 +124,11 @@ export default function TigrinyaAlphabet(): React.ReactElement {
 
           <div className="absolute inset-y-0 left-2 flex items-center">
             <button
-            type="button"
-            aria-label="Previous phonetic group"
-            onClick={goPrevious}
-            className="h-10 w-10 rounded-full bg-white border border-[rgba(17,24,39,0.08)] shadow-md text-(--color-primary) hover:bg-(--color-secondary)"
-          >
+              type="button"
+              aria-label="Previous phonetic group"
+              onClick={goPrevious}
+              className="h-10 w-10 rounded-full bg-white border border-[rgba(17,24,39,0.08)] shadow-md text-(--color-primary) hover:bg-(--color-secondary)"
+            >
               {"<"}
             </button>
           </div>
@@ -137,7 +138,7 @@ export default function TigrinyaAlphabet(): React.ReactElement {
               aria-label="Next phonetic group"
               onClick={goNext}
               className="h-10 w-10 rounded-full bg-white border border-[rgba(17,24,39,0.08)] shadow-md text-(--color-primary) hover:bg-(--color-secondary)"
-          >
+            >
               {">"}
             </button>
           </div>

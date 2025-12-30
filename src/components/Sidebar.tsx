@@ -21,6 +21,7 @@ export default function Sidebar(): React.ReactElement {
   const navItems: NavItem[] = [
     { href: "/", label: "Home", mobileLabel: "Accueil" },
     { href: "/learn-tigrinya", label: "Learn Tigrinya" },
+    { href: "/geez", label: "Geez alphabet" },
     { href: "/aetd", label: "AETD Dictionary" },
     { href: "/fonts-demo", label: "Fonts", mobileLabel: "Fonts demo" },
     { href: "/editor", label: "Editor" },

@@ -24,7 +24,7 @@ export default function AetdPage(): React.ReactElement {
   const [hasSearched, setHasSearched] = useState(false);
   const [searchScope, setSearchScope] = useState<SearchScope>("headword");
   const [prefixOnly, setPrefixOnly] = useState(true);
-  const totalEntries = entries?.length ?? 0;
+  const [showSearchOptions, setShowSearchOptions] = useState(false);
 
   const loadDictionary = useCallback(async () => {
     if (entries || loadingData) return;
@@ -136,11 +136,6 @@ export default function AetdPage(): React.ReactElement {
             </p>
           </div>
           <div className="flex gap-3 flex-wrap text-sm text-(--color-text-muted) items-center">
-            {entries && (
-              <span className="px-3 py-2 rounded-xl bg-(--color-secondary) border border-[rgba(17,24,39,0.06)]">
-                {totalEntries.toLocaleString()} entries loaded
-              </span>
-            )}
             <Link
               href="/EnglishTigrigna/help.html"
               target="_blank"
@@ -192,57 +187,78 @@ export default function AetdPage(): React.ReactElement {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-(--color-text-dark)">
-          <div className="flex flex-col gap-2 rounded-xl border border-[rgba(17,24,39,0.08)] bg-(--color-secondary) p-3">
-            <p className="font-semibold text-(--color-primary)">Search scope</p>
-            <div className="flex flex-wrap gap-3">
-              <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="scope"
-                  value="headword"
-                  checked={searchScope === "headword"}
-                  onChange={() => setSearchScope("headword")}
-                />
-                Headwords only (fastest)
-              </label>
-              <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="scope"
-                  value="all"
-                  checked={searchScope === "all"}
-                  onChange={() => setSearchScope("all")}
-                />
-                All fields (definitions, part of speech, pronunciation)
-              </label>
+        <div className="rounded-2xl border border-[rgba(17,24,39,0.06)] bg-white/60">
+          <button
+            type="button"
+            className="w-full flex items-center justify-between px-3 py-3 sm:px-4 sm:py-3 text-sm font-semibold text-(--color-primary)"
+            onClick={() => setShowSearchOptions((prev) => !prev)}
+            aria-expanded={showSearchOptions}
+            aria-controls="search-options-panel"
+          >
+            <span>Search options</span>
+            <span className="text-(--color-text-muted) text-xs">
+              {showSearchOptions ? "Hide" : "Show"} options
+            </span>
+          </button>
+          {showSearchOptions && (
+            <div
+              id="search-options-panel"
+              className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-(--color-text-dark) border-t border-[rgba(17,24,39,0.06)] px-3 py-3 sm:px-4 sm:py-4"
+            >
+              <div className="flex flex-col gap-2 rounded-xl border border-[rgba(17,24,39,0.08)] bg-(--color-secondary) p-3">
+                <p className="font-semibold text-(--color-primary)">
+                  Search scope
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <label className="inline-flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="scope"
+                      value="headword"
+                      checked={searchScope === "headword"}
+                      onChange={() => setSearchScope("headword")}
+                    />
+                    Headwords only (fastest)
+                  </label>
+                  <label className="inline-flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="scope"
+                      value="all"
+                      checked={searchScope === "all"}
+                      onChange={() => setSearchScope("all")}
+                    />
+                    All fields (definitions, part of speech, pronunciation)
+                  </label>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 rounded-xl border border-[rgba(17,24,39,0.08)] bg-(--color-secondary) p-3">
+                <p className="font-semibold text-(--color-primary)">Match type</p>
+                <div className="flex flex-wrap gap-3">
+                  <label className="inline-flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="match"
+                      value="prefix"
+                      checked={prefixOnly}
+                      onChange={() => setPrefixOnly(true)}
+                    />
+                    Starts with (recommended)
+                  </label>
+                  <label className="inline-flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="match"
+                      value="contains"
+                      checked={!prefixOnly}
+                      onChange={() => setPrefixOnly(false)}
+                    />
+                    Contains anywhere
+                  </label>
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="flex flex-col gap-2 rounded-xl border border-[rgba(17,24,39,0.08)] bg-(--color-secondary) p-3">
-            <p className="font-semibold text-(--color-primary)">Match type</p>
-            <div className="flex flex-wrap gap-3">
-              <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="match"
-                  value="prefix"
-                  checked={prefixOnly}
-                  onChange={() => setPrefixOnly(true)}
-                />
-                Starts with (recommended)
-              </label>
-              <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="match"
-                  value="contains"
-                  checked={!prefixOnly}
-                  onChange={() => setPrefixOnly(false)}
-                />
-                Contains anywhere
-              </label>
-            </div>
-          </div>
+          )}
         </div>
 
         <div className="flex items-center gap-3 text-sm text-(--color-text-muted)">
@@ -281,7 +297,7 @@ export default function AetdPage(): React.ReactElement {
             Results
           </h2>
           <div className="text-sm text-(--color-text-muted)">
-            {filteredEntries.length} of {totalEntries.toLocaleString()} shown
+            {filteredEntries.length} shown
           </div>
         </div>
 

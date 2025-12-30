@@ -33,37 +33,47 @@ export default function TigrinyaAlphabet(): React.ReactElement {
     setIndex((prev) => (prev + 1) % alphabetRows.length);
   };
 
-  const renderRow = (row: GeezCharacter, large = false) => (
-    <div
-      className={`flex flex-wrap justify-center gap-3 ${large ? "mt-4" : ""}`}
-    >
-      {row.geez.map((char, charIndex) => (
-        <div
-          key={`${row.phoneticGroup}-${char}-${charIndex}`}
-          className={`flex flex-col items-center rounded-xl bg-white border border-[rgba(17,24,39,0.06)] shadow-sm ${
-            large ? "px-4 py-3 min-w-22" : "px-3 py-2 min-w-17.5"
-          } transition-transform duration-200 ease-out hover:-translate-y-1 hover:shadow-md`}
-        >
-          <span
-            className={`${
-              large ? "text-3xl" : "text-2xl"
-            } font-semibold text-(--color-primary)`}
+  const renderRow = (row: GeezCharacter, large = false) => {
+    const entries = row.geez
+      .map((char, charIndex) => ({
+        char,
+        transliteration: row.latinTransliteration[charIndex],
+        charIndex
+      }))
+      .filter(({ char, transliteration }) => char && transliteration);
+
+    return (
+      <div
+        className={`flex flex-wrap justify-center gap-3 ${
+          large ? "mt-4" : ""
+        }`}
+      >
+        {entries.map(({ char, transliteration, charIndex }) => (
+          <div
+            key={`${row.phoneticGroup}-${char}-${charIndex}`}
+            className={`flex flex-col items-center rounded-xl bg-white border border-[rgba(17,24,39,0.06)] shadow-sm ${
+              large ? "px-4 py-3 min-w-22" : "px-3 py-2 min-w-17.5"
+            } transition-transform duration-200 ease-out hover:-translate-y-1 hover:shadow-md`}
           >
-            {char}
-          </span>
-          {row.latinTransliteration[charIndex] ? (
+            <span
+              className={`${
+                large ? "text-3xl" : "text-2xl"
+              } font-semibold text-(--color-primary)`}
+            >
+              {char}
+            </span>
             <span
               className={`${
                 large ? "text-sm" : "text-xs"
               } text-(--color-text-muted) mt-1`}
             >
-              {row.latinTransliteration[charIndex]}
+              {transliteration}
             </span>
-          ) : null}
-        </div>
-      ))}
-    </div>
-  );
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <section className="rounded-2xl border border-[rgba(17,24,39,0.08)] bg-white shadow-sm p-5 sm:p-6 space-y-4">

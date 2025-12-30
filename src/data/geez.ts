@@ -271,7 +271,7 @@ export const geezAlphabet: GeezCharacter[] = [
     order: 43
   },
   {
-    geez: ["Geez Hundred","፻","Geez Ten Thousand","፼"],
+    geez: ["፻","፼"],
     latinTransliteration: ["1^00","1^000"],
     phoneticGroup: "geez-numerals-large",
     order: 44

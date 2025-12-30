@@ -1,0 +1,49 @@
+@font-face {
+  font-family: "AsmaraSansGeez";
+  src: url('fonts/Asmara/AsmaraSansGeez-Regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "AsmaraSerifGeez";
+  src: url('fonts/Asmara/AsmaraSerifGeez-Regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+
+:root {
+  --bg: #0f172a; --card: #111827; --text: #e5e7eb; --muted: #9ca3af;
+  --accent: #22c55e; --border: #1f2937;
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 2rem; background: var(--bg); color: var(--text);
+  font-family: system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif; }
+.container { max-width: 960px; margin: 0 auto; }
+.header h1 { margin: 0 0 .25rem; font-size: 1.6rem; }
+.header p { margin: 0; color: var(--muted); }
+
+details { background: var(--card); border: 1px solid var(--border);
+  border-radius: .75rem; margin-top: 1rem; overflow: hidden; }
+summary { cursor: pointer; list-style: none; padding: 1rem 1.25rem;
+  display: flex; align-items: center; justify-content: space-between; font-weight: 600; }
+summary::marker { display: none; }
+.chevron { transition: transform .2s ease; }
+details[open] .chevron { transform: rotate(180deg); }
+.panel { padding: .75rem 1.25rem 1.25rem; border-top: 1px solid var(--border); }
+
+.sample-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .75rem; }
+.card { border: 1px solid var(--border); border-radius: .75rem; padding: .75rem .9rem; background: #0b1220; }
+.label { display: flex; align-items: center; gap: .5rem; color: var(--muted); font-size: .85rem; margin-bottom: .25rem; justify-content: space-between; }
+.dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--accent); }
+.word { font-size: 2.2rem; line-height: 1.2; letter-spacing: .01em; }
+
+.asmara-sans { font-family: "AsmaraSansGeez", system-ui, sans-serif; }
+.asmara-serif { font-family: "AsmaraSerifGeez", system-ui, serif; }
+
+.toolbar { display: flex; gap: .5rem; align-items: center; margin-top: .75rem; color: var(--muted); flex-wrap: wrap; }
+select, input[type="text"] { background: #0b1220; color: var(--text); border: 1px solid var(--border); border-radius: .5rem; padding: .4rem .6rem; }
+.preview { margin-top: .75rem; border: 1px dashed var(--border); border-radius: .5rem; padding: .75rem; font-size: 2.4rem; }
+
+.font-sample { font-size: 2rem; }
+.city-title { font-weight: 600; color: var(--muted); margin: .5rem 0; }
+
+.download-btn { font-size: .75rem; padding: .2rem .45rem; border: 1px solid var(--border); border-radius: .35rem; color: var(--text); background: #0b1220; text-decoration: none; }
+.download-btn:hover { border-color: var(--accent); }

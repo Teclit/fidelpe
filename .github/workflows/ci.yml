@@ -1,0 +1,257 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  clean:
+    name: Clean caches and workspace on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [20]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Enable Corepack (Yarn)
+        run: corepack enable
+
+      - name: Tool versions
+        run: node -v; yarn -v
+
+      - name: Clean Yarn/Yarn PnP cache and node_modules (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          rm -rf .yarn/cache .yarn/unplugged .yarn/install-state.gz \
+                 node_modules .pnp.cjs .pnp.loader.mjs
+
+      - name: Clean Yarn/Yarn PnP cache and node_modules (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $paths = @('.yarn/cache','.yarn/unplugged','.yarn/install-state.gz','node_modules','.pnp.cjs','.pnp.loader.mjs','.next')
+          foreach ($p in $paths) { if (Test-Path $p) { Remove-Item -Recurse -Force $p } }
+
+  verify:
+    name: Verify (lint + typecheck) on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    needs: clean
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [20]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Enable Corepack (Yarn)
+        run: corepack enable
+
+      - name: Restore Yarn/PnP cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .yarn/cache
+            .yarn/unplugged
+            .yarn/install-state.gz
+            .pnp.cjs
+            .pnp.loader.mjs
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Tool versions
+        run: node -v; yarn -v
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Typecheck
+        run: yarn typecheck
+
+  build:
+    name: Build on Ubuntu and upload artifact
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Enable Corepack (Yarn)
+        run: corepack enable
+
+      - name: Restore Yarn/PnP cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .yarn/cache
+            .yarn/unplugged
+            .yarn/install-state.gz
+            .pnp.cjs
+            .pnp.loader.mjs
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build
+        run: yarn build
+
+      - name: Upload build artifact (.next)
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: |
+            .next
+            next.config.ts
+            package.json
+            yarn.lock
+            .pnp.cjs
+            .pnp.loader.mjs
+          if-no-files-found: warn
+
+  deploy:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Enable Corepack (Yarn)
+        run: corepack enable
+
+      - name: Write Vercel project settings
+        shell: bash
+        run: |
+          mkdir -p .vercel
+          cat > .vercel/project.json << EOF
+          {"projectId":"${VERCEL_PROJECT_ID}","orgId":"${VERCEL_ORG_ID}"}
+          EOF
+
+      - name: Pull Vercel environment (preview/production)
+        shell: bash
+        run: |
+          ENV="preview"
+          if [[ "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_REF" == "refs/heads/master" || "$GITHUB_REF" == refs/tags/* ]]; then
+            ENV="production"
+          fi
+          npx vercel@latest pull --yes --environment="$ENV" --token="${VERCEL_TOKEN}"
+
+      - name: Install dependencies (Yarn 4)
+        run: yarn install --immutable
+
+      - name: Create prebuilt output locally (vercel build)
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUILD_FLAG=""
+          if [[ "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_REF" == "refs/heads/master" || "$GITHUB_REF" == refs/tags/* ]]; then
+            BUILD_FLAG="--prod"
+          fi
+          echo "Running vercel build with flag: '$BUILD_FLAG'"
+          npx vercel@latest build $BUILD_FLAG --token="$VERCEL_TOKEN"
+
+      - name: Deploy to Vercel (CLI)
+        id: deploy
+        shell: bash
+        run: |
+          set -eo pipefail
+          echo "GITHUB_REF=$GITHUB_REF"
+          : "${VERCEL_TOKEN:?VERCEL_TOKEN is required}"
+          PROD_FLAG=""
+          if [[ "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_REF" == "refs/heads/master" || "$GITHUB_REF" == refs/tags/* ]]; then
+            PROD_FLAG="--prod"
+          fi
+          echo "Using PROD_FLAG='$PROD_FLAG'"
+          # Deploy prebuilt output and capture the URL from CLI output
+          npx vercel@latest deploy --prebuilt --token="$VERCEL_TOKEN" --yes $PROD_FLAG 2>&1 | tee /tmp/vercel_deploy.log
+          URL=$(grep -Eo 'https://[a-zA-Z0-9.-]+\.vercel\.app' /tmp/vercel_deploy.log | tail -n1 || true)
+          echo "deployment-url=$URL" >> "$GITHUB_OUTPUT"
+
+    outputs:
+      deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+
+  steps-summary:
+    name: Steps summary
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [build, deploy]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Enable Corepack (Yarn)
+        run: corepack enable
+
+      - name: Tool versions
+        id: versions
+        run: |
+          echo "node=$(node -v)" >> $GITHUB_OUTPUT
+          echo "yarn=$(yarn -v)" >> $GITHUB_OUTPUT
+
+      - name: Generate summary
+        run: |
+          {
+            echo "# CI Summary";
+            echo "";
+            echo "- Node: ${{ steps.versions.outputs.node }}";
+            echo "- Yarn: ${{ steps.versions.outputs.yarn }}";
+            echo "- OS matrix (verify): ubuntu-latest, windows-latest";
+            echo "- Stages: clean → verify → build → deploy → steps-summary";
+            echo "- Vercel URL: ${{ needs.deploy.outputs.deployment-url || 'n/a' }}";
+          } >> $GITHUB_STEP_SUMMARY

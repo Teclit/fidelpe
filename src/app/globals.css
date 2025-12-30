@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+:root {
+    /* Primary colors */
+    --color-primary: #362925;
+    --color-primary-dark: #221714;
+    --color-primary-one: #74482a;
+    --color-primary-two: #855832;
+    --color-primary-three: #a17e61;
+    --color-primary-light: #dbc9b8;
+
+    /* Use the provided primary palette for all accents (no blue) */
+    --color-secondary: #f7f4ef; /* clair et doux pour le fond général */
+    --color-accent: var(--color-primary-one); /* #74482a */
+    --color-accent-cta: var(--color-primary-two); /* #855832 */
+
+    --color-info: #065f46; /* left as-is (green) if needed */
+    --color-warning: #f59e0b;
+    --color-error: #dc2626;
+
+    /* Text colors */
+    --color-text-dark: #111827;
+    --color-text-muted: #555d66;
+
+    --card-border: rgba(54,41,37,0.06);
+
+    --color-gradient-menu-dark: linear-gradient(
+            40deg,
+            rgba(219, 201, 184, 1) 0%,
+            rgba(116, 72, 42, 1) 50%,
+            rgb(54, 41, 37) 100%
+    );
+}
+
+/* Base */
+html, body {
+    height: 100%;
+}
+
+body {
+    color: var(--color-text-dark);
+    background: var(--color-secondary);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* (All component-specific styles migrated to Tailwind utilities in components) */

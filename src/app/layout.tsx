@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`scroll-smooth`}>
+    <html lang="en" className={`scroll-smooth`} suppressHydrationWarning>
       <body className="w-full min-h-screen bg-linear-to-br from-gray-900 to-gray-800">
         <div className="flex min-h-screen w-full backdrop-blur-sm/0">
           <Sidebar />

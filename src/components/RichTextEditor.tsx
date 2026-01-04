@@ -335,6 +335,16 @@ export default function RichTextEditor(): React.ReactElement {
       ? "bg-gray-900 text-gray-100"
       : "bg-white text-(--color-text-dark)";
 
+  const getResolvedFontFamily = useCallback((): string => {
+    if (perso.fontFamily) return `'${perso.fontFamily}', serif`;
+    const node = captureRef.current;
+    if (node) {
+      const computed = getComputedStyle(node).fontFamily;
+      if (computed) return computed;
+    }
+    return "serif";
+  }, [perso.fontFamily]);
+
   const wrapperMaxW =
     perso.pageWidth === "narrow"
       ? "max-w-2xl"
@@ -342,13 +352,40 @@ export default function RichTextEditor(): React.ReactElement {
       ? "max-w-6xl"
       : "max-w-4xl";
 
+  const wrapHtmlForDownload = (innerHtml: string): string => {
+    const font = getResolvedFontFamily();
+    const bg = perso.theme === "dark" ? "#111827" : "#ffffff";
+    const textColor = perso.theme === "dark" ? "#f3f4f6" : "#111827";
+    return `<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body {
+      font-family: ${font};
+      font-size: ${perso.fontSize}px;
+      line-height: ${perso.lineHeight};
+      color: ${textColor};
+      background: ${bg};
+      margin: 1rem;
+    }
+    .content { max-width: 960px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <div class="content">${innerHtml}</div>
+</body>
+</html>`;
+  };
+
   const exportHTML = () => {
     const html = getHtmlForExport();
     if (!html.trim()) {
       alert("Nothing to export.");
       return;
     }
-    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const wrapped = wrapHtmlForDownload(html);
+    const blob = new Blob([wrapped], { type: "text/html;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "document.html";
@@ -404,6 +441,17 @@ export default function RichTextEditor(): React.ReactElement {
     return { node, cleanup: () => node.remove() };
   };
 
+  const applyCaptureFont = (
+    node: HTMLElement,
+    font: string | null | undefined
+  ): (() => void) => {
+    const prev = node.style.fontFamily;
+    if (font) node.style.fontFamily = font;
+    return () => {
+      node.style.fontFamily = prev;
+    };
+  };
+
   const exportPng = async () => {
     const html = getHtmlForExport();
     if (!html.trim()) {
@@ -412,12 +460,13 @@ export default function RichTextEditor(): React.ReactElement {
     }
     const { node, cleanup } = getNodeForCapture(html);
     const bg = perso.theme === "dark" ? "#111827" : "#ffffff";
-    const resolvedFont = perso.fontFamily
-      ? `'${perso.fontFamily}', serif`
-      : node
-      ? getComputedStyle(node).fontFamily
-      : "serif";
+    const resolvedFont = getResolvedFontFamily();
+    const restoreFont = applyCaptureFont(node, resolvedFont);
     try {
+      // html-to-image may throw if the target node is detached; ensure it's in the DOM
+      if (!document.body.contains(node)) {
+        document.body.appendChild(node);
+      }
       // Ensure fonts are loaded; skipFonts avoids problematic font parsing/embedding
       type FontFaceSetLike = { ready?: Promise<void> };
       const fontSet = (document as Document & { fonts?: FontFaceSetLike })
@@ -427,7 +476,6 @@ export default function RichTextEditor(): React.ReactElement {
         backgroundColor: bg,
         cacheBust: true,
         pixelRatio: 2,
-        skipFonts: true,
         style: {
           fontFamily: resolvedFont,
           // Ensure consistent DPI sizing
@@ -439,10 +487,12 @@ export default function RichTextEditor(): React.ReactElement {
       a.href = dataUrl;
       a.download = "document.png";
       a.click();
+      restoreFont();
       cleanup?.();
     } catch (err) {
       console.error("Export PNG failed", err);
       alert("Export PNG failed. Try changing font or theme, then retry.");
+      restoreFont();
       cleanup?.();
     }
   };
@@ -455,12 +505,12 @@ export default function RichTextEditor(): React.ReactElement {
     }
     const { node, cleanup } = getNodeForCapture(html);
     const bg = perso.theme === "dark" ? "#111827" : "#ffffff";
-    const resolvedFont = perso.fontFamily
-      ? `'${perso.fontFamily}', serif`
-      : node
-      ? getComputedStyle(node).fontFamily
-      : "serif";
+    const resolvedFont = getResolvedFontFamily();
+    const restoreFont = applyCaptureFont(node, resolvedFont);
     try {
+      if (!document.body.contains(node)) {
+        document.body.appendChild(node);
+      }
       type FontFaceSetLike = { ready?: Promise<void> };
       const fontSet = (document as Document & { fonts?: FontFaceSetLike })
         .fonts;
@@ -470,7 +520,6 @@ export default function RichTextEditor(): React.ReactElement {
         cacheBust: true,
         quality: 0.95,
         pixelRatio: 2,
-        skipFonts: true,
         style: {
           fontFamily: resolvedFont,
           transform: "scale(1)",
@@ -481,11 +530,13 @@ export default function RichTextEditor(): React.ReactElement {
       a.href = dataUrl;
       a.download = "document.jpg";
       a.click();
+      restoreFont();
       cleanup?.();
     } catch (err) {
       console.error("Export JPG failed", err);
       alert("Export JPG failed. Try changing font or theme, then retry.");
       // ensure cleanup
+      restoreFont();
       cleanup?.();
     }
   };
@@ -499,9 +550,7 @@ export default function RichTextEditor(): React.ReactElement {
     // Build/attach a print target container
     const printTarget = document.createElement("div");
     printTarget.className = `print-target ${CONTENT_CLASSES} ${themeClasses}`;
-    printTarget.style.fontFamily = perso.fontFamily
-      ? `'${perso.fontFamily}', serif`
-      : "serif";
+    printTarget.style.fontFamily = getResolvedFontFamily();
     printTarget.style.fontSize = `${perso.fontSize}px`;
     printTarget.style.lineHeight = String(perso.lineHeight);
     printTarget.style.padding = "24px";

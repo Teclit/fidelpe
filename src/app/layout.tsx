@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import Sidebar from "@/components/Sidebar";
 
 export const metadata: Metadata = {
-  title: "FidelpeExtractX - Simplify texts",
+  title: "ፊደልፐ ምስ ጽሑፋት",
   description:
     "Simple tool to extract and simplify texts, designed for people who are not comfortable with digital technology.",
 };

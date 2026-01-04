@@ -17,7 +17,6 @@ import Link from "@tiptap/extension-link";
 import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
 import FontFamily from "@tiptap/extension-font-family";
-import { useToJpeg, useToPng } from "@hugocxl/react-to-image";
 import * as htmlToImage from "html-to-image";
 
 type LoadedFont = {
@@ -133,7 +132,6 @@ function ToolbarButton({
 }
 
 export default function RichTextEditor(): React.ReactElement {
-  const captureRef = useRef<HTMLDivElement | null>(null);
   const [fonts, setFonts] = useState<LoadedFont[]>([]);
   const [fontsLoading, setFontsLoading] = useState<boolean>(true);
   const [fontsError, setFontsError] = useState<string | null>(null);
@@ -147,9 +145,7 @@ export default function RichTextEditor(): React.ReactElement {
       list.push(font);
       groups.set(key, list);
     });
-    return Array.from(groups.entries()).sort(([a], [b]) =>
-      a.localeCompare(b)
-    );
+    return Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b));
   }, [fonts]);
   const [perso, setPerso] = useState<Personalization>(() => {
     const base = { ...DEFAULT_PERSO };
@@ -373,59 +369,6 @@ export default function RichTextEditor(): React.ReactElement {
     ? `'${perso.fontFamily}', serif`
     : "serif";
 
-  const downloadImage = useCallback((dataUrl: string, type: "png" | "jpeg") => {
-    const link = document.createElement("a");
-    link.href = dataUrl;
-    link.download = type === "png" ? "document.png" : "document.jpg";
-    link.click();
-  }, []);
-
-  const commonImageOptions = {
-    quality: 0.95,
-    cacheBust: true,
-    pixelRatio: Math.min(2, window.devicePixelRatio || 1),
-    backgroundColor: perso.theme === "dark" ? "#111827" : "#ffffff",
-    skipFonts: true, // avoid html-to-image font traversal that can throw on undefined fonts
-    style: {
-      fontFamily: captureFontFamily,
-    },
-  } as const;
-
-  const [pngState, convertToPng, registerPngRef] = useToPng<HTMLDivElement>({
-    ...commonImageOptions,
-    onSuccess: (dataUrl) => downloadImage(dataUrl, "png"),
-    onError: (error) => alert(`Export PNG failed: ${error}`),
-  });
-
-  const [jpegState, convertToJpeg, registerJpegRef] = useToJpeg<HTMLDivElement>({
-    ...commonImageOptions,
-    onSuccess: (dataUrl) => downloadImage(dataUrl, "jpeg"),
-    onError: (error) => alert(`Export JPG failed: ${error}`),
-  });
-
-  const setCaptureNode = useCallback(
-    (node: HTMLDivElement | null) => {
-      captureRef.current = node;
-      if (node) {
-        registerPngRef(node);
-        registerJpegRef(node);
-      }
-    },
-    [registerJpegRef, registerPngRef]
-  );
-
-  const isExportingImage = pngState.isLoading || jpegState.isLoading;
-
-  const getResolvedFontFamily = useCallback((): string => {
-    if (perso.fontFamily) return `'${perso.fontFamily}', serif`;
-    const node = captureRef.current;
-    if (node) {
-      const computed = getComputedStyle(node).fontFamily;
-      if (computed) return computed;
-    }
-    return captureFontFamily;
-  }, [captureFontFamily, perso.fontFamily]);
-
   const ensureFontReady = useCallback(async () => {
     type FontFaceSetLike = {
       load?: (font: string) => Promise<unknown>;
@@ -508,129 +451,6 @@ export default function RichTextEditor(): React.ReactElement {
       ? "max-w-6xl"
       : "max-w-4xl";
 
-  const wrapHtmlForDownload = (
-    innerHtml: string,
-    fontEmbedCSS?: string | null
-  ): string => {
-    const font = getResolvedFontFamily();
-    const bg = perso.theme === "dark" ? "#111827" : "#ffffff";
-    const textColor = perso.theme === "dark" ? "#f3f4f6" : "#111827";
-    return `<!doctype html>
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <style>
-    ${fontEmbedCSS?.trim() ? `${fontEmbedCSS}\n` : ""}
-    body {
-      font-family: ${font};
-      font-size: ${perso.fontSize}px;
-      line-height: ${perso.lineHeight};
-      color: ${textColor};
-      background: ${bg};
-      margin: 1rem;
-    }
-    .content { max-width: 960px; margin: 0 auto; }
-  </style>
-</head>
-<body>
-  <div class="content">${innerHtml}</div>
-</body>
-</html>`;
-  };
-
-  const exportHTML = async () => {
-    const html = getHtmlForExport();
-    if (!html.trim()) {
-      alert("Nothing to export.");
-      return;
-    }
-    const { node, cleanup } = getNodeForCapture(html);
-    let fontEmbedCSS: string | null = null;
-    try {
-      if (!document.body.contains(node)) {
-        document.body.appendChild(node);
-      }
-      fontEmbedCSS = await buildFontEmbedCSS(node);
-    } catch (err) {
-      console.error("Unable to prepare fonts for HTML export", err);
-    }
-    const wrapped = wrapHtmlForDownload(html, fontEmbedCSS);
-    cleanup?.();
-    const blob = new Blob([wrapped], { type: "text/html;charset=utf-8" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "document.html";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  };
-
-  const exportText = () => {
-    const tmpHtml = getHtmlForExport();
-    const tempEl = document.createElement("div");
-    tempEl.innerHTML = tmpHtml;
-    const text = tempEl.textContent?.trim() || "";
-    if (!text) {
-      alert("Nothing to export.");
-      return;
-    }
-    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "document.txt";
-    a.click();
-    URL.revokeObjectURL(a.href);
-  };
-
-  const buildOffscreenNodeFromSaved = (savedHtml: string): HTMLDivElement => {
-    const node = document.createElement("div");
-    node.className = `${CONTENT_CLASSES} ${themeClasses} p-4 sm:p-6`;
-    node.style.fontFamily = perso.fontFamily
-      ? `'${perso.fontFamily}', serif`
-      : "serif";
-    node.style.fontSize = `${perso.fontSize}px`;
-    node.style.lineHeight = String(perso.lineHeight);
-    node.style.position = "fixed";
-    node.style.left = "-99999px";
-    node.style.top = "-99999px";
-    node.style.pointerEvents = "none";
-    node.style.width = captureRef.current
-      ? `${captureRef.current.clientWidth}px`
-      : "auto";
-    node.innerHTML = savedHtml;
-    document.body.appendChild(node);
-    return node;
-  };
-
-  const getNodeForCapture = (
-    html: string
-  ): { node: HTMLElement; cleanup?: () => void } => {
-    if (captureRef.current) {
-      // Use the live editor DOM to guarantee we capture current content/styles
-      return { node: captureRef.current };
-    }
-    const node = buildOffscreenNodeFromSaved(html);
-    return { node, cleanup: () => node.remove() };
-  };
-
-  const exportImage = async (type: "png" | "jpeg") => {
-    const html = getHtmlForExport();
-    if (!html.trim()) {
-      alert("Nothing to export.");
-      return;
-    }
-    if (isExportingImage) return;
-    if (!captureRef.current) {
-      alert("Editor is not ready yet.");
-      return;
-    }
-    await ensureFontReady();
-    if (type === "png") {
-      convertToPng();
-    } else {
-      convertToJpeg();
-    }
-  };
-
   const printSaved = async () => {
     const html = getHtmlForExport();
     if (!html.trim()) {
@@ -640,7 +460,7 @@ export default function RichTextEditor(): React.ReactElement {
     // Build/attach a print target container
     const printTarget = document.createElement("div");
     printTarget.className = `print-target ${CONTENT_CLASSES} ${themeClasses}`;
-    printTarget.style.fontFamily = getResolvedFontFamily();
+    printTarget.style.fontFamily = captureFontFamily;
     printTarget.style.fontSize = `${perso.fontSize}px`;
     printTarget.style.lineHeight = String(perso.lineHeight);
     printTarget.style.padding = "24px";
@@ -1085,36 +905,6 @@ export default function RichTextEditor(): React.ReactElement {
             )}
             <button
               type="button"
-              className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
-              onClick={exportHTML}
-            >
-              Export HTML
-            </button>
-            <button
-              type="button"
-              className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
-              onClick={exportText}
-            >
-              Export TXT
-            </button>
-            <button
-              type="button"
-              className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
-              onClick={() => exportImage("png")}
-              disabled={isExportingImage}
-            >
-              Export PNG
-            </button>
-            <button
-              type="button"
-              className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
-              onClick={() => exportImage("jpeg")}
-              disabled={isExportingImage}
-            >
-              Export JPG
-            </button>
-            <button
-              type="button"
               className="px-3 py-1 rounded-md border border-gray-300 bg-white text-sm"
               onClick={printSaved}
             >
@@ -1144,7 +934,6 @@ export default function RichTextEditor(): React.ReactElement {
         className={`mx-auto ${wrapperMaxW} shadow-sm rounded-xl border border-(--card-border) overflow-hidden`}
       >
         <div
-          ref={setCaptureNode}
           className={`${themeClasses} p-4 sm:p-6`}
           style={{
             fontFamily: captureFontFamily,

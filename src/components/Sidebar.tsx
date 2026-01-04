@@ -30,8 +30,9 @@ export default function Sidebar(): React.ReactElement {
   ];
 
   const isActive = useCallback(
-    (href: string) => (href === "/" ? pathname === "/" : pathname?.startsWith(href)),
-    [pathname],
+    (href: string) =>
+      href === "/" ? pathname === "/" : pathname?.startsWith(href),
+    [pathname]
   );
 
   const navLinkBase =
@@ -44,7 +45,7 @@ export default function Sidebar(): React.ReactElement {
         type="button"
         aria-label="Ouvrir le menu"
         onClick={toggle}
-        className="md:hidden fixed top-4 left-4 z-40 inline-flex items-center justify-center h-10 w-10 rounded-md bg-white/90 border border-gray-200 shadow-sm text-(--color-text-dark) hover:bg-white focus:outline-none focus:ring-2 focus:ring-(--color-accent)"
+        className="md:hidden fixed top-2 left-2 z-40 inline-flex items-center justify-center h-10 w-10 rounded-md bg-white/90 border border-gray-200 shadow-sm text-(--color-text-dark) hover:bg-white focus:outline-none focus:ring-2 focus:ring-(--color-accent)"
       >
         <FiMenu size={20} />
       </button>

@@ -410,7 +410,7 @@ export default function FontsDemo() {
                   id="textInput"
                   type="text"
                   value={previewText}
-                  onChange={(e) => setPreviewText(e.target.value || "ሰላም")}
+                  onChange={(e) => setPreviewText(e.target.value || "ሰላም ብጾት")}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>

@@ -17,6 +17,7 @@ import Link from "@tiptap/extension-link";
 import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
 import FontFamily from "@tiptap/extension-font-family";
+import { useToJpeg, useToPng } from "@hugocxl/react-to-image";
 import * as htmlToImage from "html-to-image";
 
 type LoadedFont = {
@@ -356,6 +357,53 @@ export default function RichTextEditor(): React.ReactElement {
       ? "bg-gray-900 text-gray-100"
       : "bg-white text-(--color-text-dark)";
 
+  const captureFontFamily = perso.fontFamily
+    ? `'${perso.fontFamily}', serif`
+    : "serif";
+
+  const downloadImage = useCallback((dataUrl: string, type: "png" | "jpeg") => {
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = type === "png" ? "document.png" : "document.jpg";
+    link.click();
+  }, []);
+
+  const commonImageOptions = {
+    quality: 0.95,
+    cacheBust: true,
+    pixelRatio: Math.min(2, window.devicePixelRatio || 1),
+    backgroundColor: perso.theme === "dark" ? "#111827" : "#ffffff",
+    skipFonts: true, // avoid html-to-image font traversal that can throw on undefined fonts
+    style: {
+      fontFamily: captureFontFamily,
+    },
+  } as const;
+
+  const [pngState, convertToPng, registerPngRef] = useToPng<HTMLDivElement>({
+    ...commonImageOptions,
+    onSuccess: (dataUrl) => downloadImage(dataUrl, "png"),
+    onError: (error) => alert(`Export PNG failed: ${error}`),
+  });
+
+  const [jpegState, convertToJpeg, registerJpegRef] = useToJpeg<HTMLDivElement>({
+    ...commonImageOptions,
+    onSuccess: (dataUrl) => downloadImage(dataUrl, "jpeg"),
+    onError: (error) => alert(`Export JPG failed: ${error}`),
+  });
+
+  const setCaptureNode = useCallback(
+    (node: HTMLDivElement | null) => {
+      captureRef.current = node;
+      if (node) {
+        registerPngRef(node);
+        registerJpegRef(node);
+      }
+    },
+    [registerJpegRef, registerPngRef]
+  );
+
+  const isExportingImage = pngState.isLoading || jpegState.isLoading;
+
   const getResolvedFontFamily = useCallback((): string => {
     if (perso.fontFamily) return `'${perso.fontFamily}', serif`;
     const node = captureRef.current;
@@ -363,8 +411,8 @@ export default function RichTextEditor(): React.ReactElement {
       const computed = getComputedStyle(node).fontFamily;
       if (computed) return computed;
     }
-    return "serif";
-  }, [perso.fontFamily]);
+    return captureFontFamily;
+  }, [captureFontFamily, perso.fontFamily]);
 
   const ensureFontReady = useCallback(async () => {
     type FontFaceSetLike = {
@@ -393,12 +441,12 @@ export default function RichTextEditor(): React.ReactElement {
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Font fetch failed (${res.status})`);
       const buf = await res.arrayBuffer();
-      const b64 = btoa(
-        String.fromCharCode(...Array.from(new Uint8Array(buf)))
-      );
       const ext = active.path.toLowerCase();
-      const mime = ext.endsWith(".otf") ? "font/otf" : "font/ttf";
-      const css = `@font-face { font-family: '${active.faceName}'; src: url(data:${mime};base64,${b64}) format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }`;
+      const b64 = arrayBufferToBase64(buf);
+      const isOtf = ext.endsWith(".otf");
+      const mime = isOtf ? "font/otf" : "font/ttf";
+      const format = isOtf ? "opentype" : "truetype";
+      const css = `@font-face { font-family: '${active.faceName}'; src: url(data:${mime};base64,${b64}) format('${format}'); font-weight: 400; font-style: normal; font-display: swap; }`;
       fontFileCssCache.current.set(key, css);
       return css;
     } catch (err) {
@@ -421,9 +469,13 @@ export default function RichTextEditor(): React.ReactElement {
         });
         let resultCss = css?.trim() || null;
         // If the helper did not embed the active font, fall back to manual inline data URL
-        if (!resultCss || (perso.fontFamily && !resultCss.includes(perso.fontFamily))) {
+        if (
+          !resultCss ||
+          (perso.fontFamily && !resultCss.includes(perso.fontFamily))
+        ) {
           const fallbackCss = await buildFontFileCSS();
-          resultCss = [resultCss, fallbackCss].filter(Boolean).join("\n") || null;
+          resultCss =
+            [resultCss, fallbackCss].filter(Boolean).join("\n") || null;
         }
         if (resultCss) {
           fontEmbedCache.current.set(key, resultCss);
@@ -548,70 +600,22 @@ export default function RichTextEditor(): React.ReactElement {
     return { node, cleanup: () => node.remove() };
   };
 
-  const applyCaptureFont = (
-    node: HTMLElement,
-    font: string | null | undefined
-  ): (() => void) => {
-    const prev = node.style.fontFamily;
-    if (font) node.style.fontFamily = font;
-    return () => {
-      node.style.fontFamily = prev;
-    };
-  };
-
   const exportImage = async (type: "png" | "jpeg") => {
     const html = getHtmlForExport();
     if (!html.trim()) {
       alert("Nothing to export.");
       return;
     }
-    const { node, cleanup } = getNodeForCapture(html);
-    const bg = perso.theme === "dark" ? "#111827" : "#ffffff";
-    const resolvedFont = getResolvedFontFamily();
-    const restoreFont = applyCaptureFont(node, resolvedFont);
-    try {
-      // html-to-image may throw if the target node is detached; ensure it's in the DOM
-      if (!document.body.contains(node)) {
-        document.body.appendChild(node);
-      }
-      await ensureFontReady();
-      const fontEmbedCSS = await buildFontEmbedCSS(node);
-      const commonOptions = {
-        backgroundColor: bg,
-        cacheBust: true,
-        pixelRatio: 2,
-        preferredFontFormat: "truetype" as const,
-        fontEmbedCSS: fontEmbedCSS || undefined,
-        style: {
-          fontFamily: resolvedFont,
-          // Ensure consistent DPI sizing
-          transform: "scale(1)",
-          transformOrigin: "top left",
-        },
-      };
-      const dataUrl =
-        type === "png"
-          ? await htmlToImage.toPng(node, commonOptions)
-          : await htmlToImage.toJpeg(node, {
-              ...commonOptions,
-              quality: 0.95,
-            });
-      const a = document.createElement("a");
-      a.href = dataUrl;
-      a.download = type === "png" ? "document.png" : "document.jpg";
-      a.click();
-      restoreFont();
-      cleanup?.();
-    } catch (err) {
-      console.error(
-        `Export ${type.toUpperCase()} failed (fonts may be missing)`,
-        err
-      );
-      alert(
-        `Export ${type.toUpperCase()} failed. Try changing font or theme, then retry.`
-      );
-      restoreFont();
-      cleanup?.();
+    if (isExportingImage) return;
+    if (!captureRef.current) {
+      alert("Editor is not ready yet.");
+      return;
+    }
+    await ensureFontReady();
+    if (type === "png") {
+      convertToPng();
+    } else {
+      convertToJpeg();
     }
   };
 
@@ -1081,6 +1085,7 @@ export default function RichTextEditor(): React.ReactElement {
               type="button"
               className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
               onClick={() => exportImage("png")}
+              disabled={isExportingImage}
             >
               Export PNG
             </button>
@@ -1088,6 +1093,7 @@ export default function RichTextEditor(): React.ReactElement {
               type="button"
               className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
               onClick={() => exportImage("jpeg")}
+              disabled={isExportingImage}
             >
               Export JPG
             </button>
@@ -1122,12 +1128,10 @@ export default function RichTextEditor(): React.ReactElement {
         className={`mx-auto ${wrapperMaxW} shadow-sm rounded-xl border border-(--card-border) overflow-hidden`}
       >
         <div
-          ref={captureRef}
+          ref={setCaptureNode}
           className={`${themeClasses} p-4 sm:p-6`}
           style={{
-            fontFamily: perso.fontFamily
-              ? `'${perso.fontFamily}', serif`
-              : undefined,
+            fontFamily: captureFontFamily,
           }}
         >
           <div

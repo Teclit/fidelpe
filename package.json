@@ -17,6 +17,7 @@
     "clean-cache": "yarn cache clean"
   },
   "dependencies": {
+    "@hugocxl/react-to-image": "^0.0.9",
     "@tiptap/core": "^3.10.2",
     "@tiptap/extension-color": "^3.10.2",
     "@tiptap/extension-font-family": "^3.10.2",

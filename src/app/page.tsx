@@ -13,6 +13,7 @@ export default function Home(): React.ReactElement {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
 
   const simplifyText = useCallback((input: string) => {
     const collapsed = input.replace(/\s+/g, " ").trim();
@@ -23,23 +24,114 @@ export default function Home(): React.ReactElement {
       .join(" ");
   }, []);
 
-  const handleProcess = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!text.trim()) {
-      setResult("[No text provided]");
-      return;
+  const extractTextFromFile = useCallback(async (selectedFile: File) => {
+    const mime = selectedFile.type;
+    const name = selectedFile.name.toLowerCase();
+
+    if (mime.includes("pdf") || name.endsWith(".pdf")) {
+      const pdfjs = await import("pdfjs-dist/legacy/build/pdf");
+      const worker = await import("pdfjs-dist/build/pdf.worker.min.mjs");
+      const workerSrc =
+        (worker as { default?: string }).default ??
+        ((worker as unknown) as string);
+      pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
+      const data = new Uint8Array(await selectedFile.arrayBuffer());
+      const doc = await pdfjs.getDocument({ data }).promise;
+      let textFromPdf = "";
+
+      for (let pageIndex = 1; pageIndex <= doc.numPages; pageIndex += 1) {
+        const page = await doc.getPage(pageIndex);
+        const content = await page.getTextContent();
+        const getText = (item: unknown) => {
+          if (typeof item === "object" && item !== null) {
+            const candidate = item as { str?: string; text?: string };
+            if (typeof candidate.str === "string") return candidate.str;
+            if (typeof candidate.text === "string") return candidate.text;
+          }
+          return "";
+        };
+        textFromPdf += `${content.items
+          .map((item) => getText(item))
+          .join(" ")}\n`;
+      }
+
+      return textFromPdf.trim();
     }
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 300));
-    setResult(simplifyText(text));
-    setLoading(false);
-  };
+
+    if (
+      mime ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+      name.endsWith(".docx")
+    ) {
+      const mammoth = await import("mammoth/mammoth.browser");
+      const arrayBuffer = await selectedFile.arrayBuffer();
+      const { value } = await mammoth.extractRawText({ arrayBuffer });
+      return value?.trim() ?? "";
+    }
+
+    if (mime.startsWith("text/") || name.endsWith(".txt")) {
+      return (await selectedFile.text()).trim();
+    }
+
+    if (mime.startsWith("image/")) {
+      const Tesseract = await import("tesseract.js");
+      const objectUrl = URL.createObjectURL(selectedFile);
+
+      try {
+        const {
+          data: { text: ocrText },
+        } = await Tesseract.recognize(objectUrl, "eng");
+        return ocrText?.trim() ?? "";
+      } finally {
+        URL.revokeObjectURL(objectUrl);
+      }
+    }
+
+    return `[Unsupported file type: ${selectedFile.name}]`;
+  }, []);
+
+  const handleProcess = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoading(true);
+
+      try {
+        let content = text;
+
+        if (file) {
+          const extracted = await extractTextFromFile(file);
+          content = [content, extracted].filter(Boolean).join("\n\n");
+          setText(content);
+        }
+
+        if (!content.trim()) {
+          setResult("[No text provided]");
+          return;
+        }
+
+        await new Promise((r) => setTimeout(r, 300));
+        setResult(simplifyText(content));
+      } catch (err) {
+        console.error(err);
+        setResult(
+          "We could not extract text from this document. Please try another file or paste the text."
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [extractTextFromFile, file, simplifyText, text]
+  );
 
   const handleFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        setText((prev) => `${prev ? `${prev}\n` : ""}[Image: ${file.name}]`);
+      const selected = e.target.files?.[0] ?? null;
+      setFile(selected);
+
+      if (selected) {
+        setText((prev) =>
+          `${prev ? `${prev}\n` : ""}[Selected: ${selected.name}]`
+        );
       }
     },
     []
@@ -48,6 +140,7 @@ export default function Home(): React.ReactElement {
   const handleReset = useCallback(() => {
     setText("");
     setResult("");
+    setFile(null);
   }, []);
 
   const handleCopy = useCallback(() => {
@@ -94,11 +187,11 @@ export default function Home(): React.ReactElement {
           <label className="inline-flex gap-2 items-center justify-center text-center py-[0.6rem] px-[0.9rem] bg-(--color-secondary) border border-[rgba(0,0,0,0.06)] rounded-xl cursor-pointer text-[#111827] text-[0.98rem] w-full sm:w-auto">
             <input
               type="file"
-              accept="image/*"
+              accept=".pdf,.docx,.txt,image/*"
               onChange={handleFileChange}
               className="hidden"
             />
-            📁 Import a photo / scan
+            📁 Import a doc / photo / scan
           </label>
 
           <div className="flex gap-2 w-full sm:w-auto">

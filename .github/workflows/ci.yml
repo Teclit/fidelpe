@@ -153,6 +153,7 @@ jobs:
   deploy:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' && secrets.VERCEL_TOKEN != '' && secrets.VERCEL_ORG_ID != '' && secrets.VERCEL_PROJECT_ID != '' }}
     needs: build
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -170,17 +171,16 @@ jobs:
       - name: Enable Corepack (Yarn)
         run: corepack enable
 
-      - name: Write Vercel project settings
+      - name: Ensure no stale Vercel linking
         shell: bash
-        run: |
-          mkdir -p .vercel
-          cat > .vercel/project.json << EOF
-          {"projectId":"${VERCEL_PROJECT_ID}","orgId":"${VERCEL_ORG_ID}"}
-          EOF
+        run: rm -rf .vercel
 
       - name: Pull Vercel environment (preview/production)
         shell: bash
         run: |
+          : "${VERCEL_TOKEN:?VERCEL_TOKEN is required}"
+          : "${VERCEL_ORG_ID:?VERCEL_ORG_ID is required}"
+          : "${VERCEL_PROJECT_ID:?VERCEL_PROJECT_ID is required}"
           ENV="preview"
           if [[ "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_REF" == "refs/heads/master" || "$GITHUB_REF" == refs/tags/* ]]; then
             ENV="production"

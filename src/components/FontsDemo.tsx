@@ -515,6 +515,17 @@ export default function FontsDemo() {
           </div>
         )}
       </details>
+
+      <footer className="mt-8 text-center text-sm text-gray-600">
+        <a
+          href="/Non-Technical-Guide-Word-GoogleDocs.md.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gray-700 hover:text-blue-800 underline"
+        >
+          How to use these fonts (PDF)
+        </a>
+      </footer>
     </div>
   );
 }

@@ -33,7 +33,7 @@ export default function Home(): React.ReactElement {
       const worker = await import("pdfjs-dist/build/pdf.worker.min.mjs");
       const workerSrc =
         (worker as { default?: string }).default ??
-        ((worker as unknown) as string);
+        (worker as unknown as string);
       pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
       const data = new Uint8Array(await selectedFile.arrayBuffer());
       const doc = await pdfjs.getDocument({ data }).promise;
@@ -175,12 +175,12 @@ export default function Home(): React.ReactElement {
           id="text"
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Paste text here or import a photo/scan."
+          placeholder="Paste text here or import a photo."
           className="w-full min-h-48 sm:min-h-56 p-3 sm:p-[0.9rem] rounded-xl border border-[rgba(54,41,37,0.12)] bg-white text-(--color-text-dark) resize-y shadow-[inset_0_1px_0_rgba(0,0,0,0.02)] text-sm sm:text-base focus:outline focus:outline-[rgba(133,88,50,0.12)] focus:border-(--color-accent-cta)"
         />
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-3">
-          <label className="inline-flex gap-2 items-center justify-center text-center py-[0.6rem] px-[0.9rem] bg-(--color-secondary) border border-[rgba(0,0,0,0.06)] rounded-xl cursor-pointer text-[#111827] text-[0.98rem] w-full sm:w-auto">
+          <label className="inline-flex gap-2 items-center justify-center text-center py-[0.6rem] px-[0.9rem] bg-(--color-accent-cta) border border-[rgba(0,0,0,0.06)] rounded-xl cursor-pointer text-[#111827] text-[0.98rem] w-full sm:w-auto">
             <input
               type="file"
               accept=".pdf,.docx,.txt,image/*"

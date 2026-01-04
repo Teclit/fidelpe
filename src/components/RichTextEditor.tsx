@@ -155,6 +155,27 @@ export default function RichTextEditor(): React.ReactElement {
     }
   }, []);
 
+  const hasVisibleContent = useCallback((html: string) => {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html;
+    return (tmp.textContent || "").trim().length > 0;
+  }, []);
+
+  const persistContent = useCallback(
+    (html: string, opts?: { silent?: boolean }) => {
+      try {
+        localStorage.setItem(STORAGE_KEY_CONTENT, html);
+        setSavedAt(Date.now());
+      } catch (e) {
+        console.error("Save failed", e);
+        if (!opts?.silent) {
+          alert("Save failed. Check storage permissions and retry.");
+        }
+      }
+    },
+    []
+  );
+
   useEffect(() => {
     let active = true;
     setFontsLoading(true);
@@ -282,25 +303,18 @@ export default function RichTextEditor(): React.ReactElement {
 
   const saveDocument = useCallback(() => {
     const html = editor?.getHTML() ?? "";
-    try {
-      localStorage.setItem(STORAGE_KEY_CONTENT, html);
-      setSavedAt(Date.now());
-    } catch (e) {
-      console.error("Save failed", e);
-      alert("Save failed. Check storage permissions and retry.");
-    }
-  }, [editor]);
+    persistContent(html);
+  }, [editor, persistContent]);
 
-  // Prefer current editor content when exporting/printing; fall back to saved
   const getHtmlForExport = useCallback((): string => {
     const htmlNow = editor?.getHTML() ?? "";
-    // Determine if current content has any visible text
-    const tmp = document.createElement("div");
-    tmp.innerHTML = htmlNow;
-    const textNow = (tmp.textContent || "").trim();
-    if (textNow.length > 0) return htmlNow;
-    return getSavedHtml();
-  }, [editor, getSavedHtml]);
+    const html = hasVisibleContent(htmlNow) ? htmlNow : getSavedHtml();
+    if (html.trim()) {
+      // Save whatever we are about to output so localStorage stays in sync
+      persistContent(html, { silent: true });
+    }
+    return html;
+  }, [editor, getSavedHtml, hasVisibleContent, persistContent]);
 
   useEffect(() => {
     try {
@@ -329,8 +343,6 @@ export default function RichTextEditor(): React.ReactElement {
       : "max-w-4xl";
 
   const exportHTML = () => {
-    // Keep saved copy in sync, but export uses current content if present
-    saveDocument();
     const html = getHtmlForExport();
     if (!html.trim()) {
       alert("Nothing to export.");
@@ -345,8 +357,6 @@ export default function RichTextEditor(): React.ReactElement {
   };
 
   const exportText = () => {
-    // Keep saved copy in sync, but export uses current content if present
-    saveDocument();
     const tmpHtml = getHtmlForExport();
     const tempEl = document.createElement("div");
     tempEl.innerHTML = tmpHtml;
@@ -384,8 +394,6 @@ export default function RichTextEditor(): React.ReactElement {
   };
 
   const exportPng = async () => {
-    // Keep saved copy in sync, but export uses current content if present
-    saveDocument();
     const html = getHtmlForExport();
     if (!html.trim()) {
       alert("Nothing to export.");
@@ -429,8 +437,6 @@ export default function RichTextEditor(): React.ReactElement {
   };
 
   const exportJpeg = async () => {
-    // Keep saved copy in sync, but export uses current content if present
-    saveDocument();
     const html = getHtmlForExport();
     if (!html.trim()) {
       alert("Nothing to export.");
@@ -476,8 +482,6 @@ export default function RichTextEditor(): React.ReactElement {
   };
 
   const printSaved = async () => {
-    // Keep saved copy in sync, but print uses current content if present
-    saveDocument();
     const html = getHtmlForExport();
     if (!html.trim()) {
       alert("Nothing to print.");

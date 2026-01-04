@@ -139,6 +139,18 @@ export default function RichTextEditor(): React.ReactElement {
   const [fontsError, setFontsError] = useState<string | null>(null);
   const fontEmbedCache = useRef<Map<string, string>>(new Map());
   const fontFileCssCache = useRef<Map<string, string>>(new Map());
+  const fontsByCity = useMemo(() => {
+    const groups = new Map<string, LoadedFont[]>();
+    fonts.forEach((font) => {
+      const key = font.city?.trim() || "Other";
+      const list = groups.get(key) || [];
+      list.push(font);
+      groups.set(key, list);
+    });
+    return Array.from(groups.entries()).sort(([a], [b]) =>
+      a.localeCompare(b)
+    );
+  }, [fonts]);
   const [perso, setPerso] = useState<Personalization>(() => {
     const base = { ...DEFAULT_PERSO };
     try {
@@ -863,10 +875,14 @@ export default function RichTextEditor(): React.ReactElement {
             <option value="" disabled>
               {fontsLoading ? "Loading fonts..." : "Select a font"}
             </option>
-            {fonts.map((f) => (
-              <option key={f.faceName} value={f.faceName}>
-                {f.family || f.full_name || f.file || f.faceName}
-              </option>
+            {fontsByCity.map(([city, group]) => (
+              <optgroup key={city} label={city}>
+                {group.map((f) => (
+                  <option key={f.faceName} value={f.faceName}>
+                    {f.family || f.full_name || f.file || f.faceName}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
           {fontsError && (

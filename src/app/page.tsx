@@ -74,15 +74,17 @@ export default function Home(): React.ReactElement {
     }
 
     if (mime.startsWith("image/")) {
-      const Tesseract = await import("tesseract.js");
+      const { createWorker } = await import("tesseract.js");
       const objectUrl = URL.createObjectURL(selectedFile);
 
+      const worker = await createWorker("eng+amh");
       try {
         const {
           data: { text: ocrText },
-        } = await Tesseract.recognize(objectUrl, "eng");
+        } = await worker.recognize(objectUrl);
         return ocrText?.trim() ?? "";
       } finally {
+        await worker.terminate();
         URL.revokeObjectURL(objectUrl);
       }
     }
@@ -127,12 +129,6 @@ export default function Home(): React.ReactElement {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const selected = e.target.files?.[0] ?? null;
       setFile(selected);
-
-      if (selected) {
-        setText((prev) =>
-          `${prev ? `${prev}\n` : ""}[Selected: ${selected.name}]`
-        );
-      }
     },
     []
   );
@@ -193,6 +189,11 @@ export default function Home(): React.ReactElement {
             />
             📁 Import a doc / photo / scan
           </label>
+          {file?.name && (
+            <span className="text-(--color-text-muted) text-sm sm:text-base sm:pl-1">
+              Selected: {file.name}
+            </span>
+          )}
 
           <div className="flex gap-2 w-full sm:w-auto">
             <button

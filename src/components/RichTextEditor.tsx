@@ -365,6 +365,14 @@ export default function RichTextEditor(): React.ReactElement {
       ? "bg-gray-900 text-gray-100"
       : "bg-white text-(--color-text-dark)";
 
+  const applyPrintFrame = useCallback((node: HTMLElement) => {
+    node.style.padding = "24px";
+    node.style.borderTop = "2px solid #222";
+    node.style.borderBottom = "2px solid #222";
+    node.style.boxSizing = "border-box";
+    node.style.minHeight = "100vh";
+  }, []);
+
   const captureFontFamily = perso.fontFamily
     ? `'${perso.fontFamily}', serif`
     : "serif";
@@ -453,17 +461,13 @@ export default function RichTextEditor(): React.ReactElement {
 
   const printSaved = async () => {
     const html = getHtmlForExport();
-    if (!html.trim()) {
-      alert("Nothing to print.");
-      return;
-    }
     // Build/attach a print target container
     const printTarget = document.createElement("div");
     printTarget.className = `print-target ${CONTENT_CLASSES} ${themeClasses}`;
     printTarget.style.fontFamily = captureFontFamily;
     printTarget.style.fontSize = `${perso.fontSize}px`;
     printTarget.style.lineHeight = String(perso.lineHeight);
-    printTarget.style.padding = "24px";
+    applyPrintFrame(printTarget);
     printTarget.innerHTML = html;
     document.body.appendChild(printTarget);
     let fontEmbedStyle: HTMLStyleElement | null = null;
@@ -498,7 +502,17 @@ export default function RichTextEditor(): React.ReactElement {
       @media print {
         body * { visibility: hidden !important; }
         .print-target, .print-target * { visibility: visible !important; }
-        .print-target { position: absolute; left: 0; top: 0; width: 100%; }
+        .print-target {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          padding: 24px;
+          border-top: 2px solid #222;
+          border-bottom: 2px solid #222;
+          box-sizing: border-box;
+          min-height: 100vh;
+        }
       }
     `;
     document.head.appendChild(style);

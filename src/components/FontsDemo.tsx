@@ -24,7 +24,7 @@ export default function FontsDemo() {
   const [cityMap, setCityMap] = useState<CityMap>({});
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [selectedFont, setSelectedFont] = useState<string>("");
-  const [previewText, setPreviewText] = useState<string>("ሰላም");
+  const [previewText, setPreviewText] = useState<string>("ሰላም ብጾት");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>(

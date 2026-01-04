@@ -461,6 +461,10 @@ export default function RichTextEditor(): React.ReactElement {
 
   const printSaved = async () => {
     const html = getHtmlForExport();
+    if (!hasVisibleContent(html)) {
+      alert("Nothing to print.");
+      return;
+    }
     // Build/attach a print target container
     const printTarget = document.createElement("div");
     printTarget.className = `print-target ${CONTENT_CLASSES} ${themeClasses}`;
@@ -513,6 +517,7 @@ export default function RichTextEditor(): React.ReactElement {
           box-sizing: border-box;
           min-height: 100vh;
         }
+        a[href]::after { content: none !important; }
       }
     `;
     document.head.appendChild(style);

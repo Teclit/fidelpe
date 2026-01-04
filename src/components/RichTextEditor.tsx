@@ -865,7 +865,7 @@ export default function RichTextEditor(): React.ReactElement {
 
           <label className="text-xs mr-2">Font</label>
           <select
-            className="mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
+            className="mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm w-56"
             value={perso.fontFamily}
             onChange={(e) => {
               if (e.target.value) setFont(e.target.value);

@@ -58,6 +58,20 @@ const DEFAULT_PERSO: Personalization = {
 
 const STORAGE_KEY_CONTENT = "editor.document.html";
 const STORAGE_KEY_PERSO = "editor.perso";
+
+const arrayBufferToBase64 = (buf: ArrayBuffer): string => {
+  const bytes = new Uint8Array(buf);
+  const chunk = 0x8000;
+  let binary = "";
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode.apply(
+      null,
+      Array.from(bytes.subarray(i, i + chunk))
+    );
+  }
+  return btoa(binary);
+};
+
 // Legacy default template we used previously; treat it as empty to avoid exporting it
 const DEFAULT_TEMPLATE_HTML =
   "<h2>Welcome</h2><p>Start typing your document here…</p>";
@@ -122,6 +136,8 @@ export default function RichTextEditor(): React.ReactElement {
   const [fonts, setFonts] = useState<LoadedFont[]>([]);
   const [fontsLoading, setFontsLoading] = useState<boolean>(true);
   const [fontsError, setFontsError] = useState<string | null>(null);
+  const fontEmbedCache = useRef<Map<string, string>>(new Map());
+  const fontFileCssCache = useRef<Map<string, string>>(new Map());
   const [perso, setPerso] = useState<Personalization>(() => {
     const base = { ...DEFAULT_PERSO };
     try {
@@ -226,6 +242,11 @@ export default function RichTextEditor(): React.ReactElement {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    fontEmbedCache.current.clear();
+    fontFileCssCache.current.clear();
+  }, [perso.fontFamily, fonts]);
 
   useEffect(() => {
     if (!fonts.length) return;
@@ -345,6 +366,77 @@ export default function RichTextEditor(): React.ReactElement {
     return "serif";
   }, [perso.fontFamily]);
 
+  const ensureFontReady = useCallback(async () => {
+    type FontFaceSetLike = {
+      load?: (font: string) => Promise<unknown>;
+      ready?: Promise<void>;
+    };
+    const fontSet = (document as Document & { fonts?: FontFaceSetLike }).fonts;
+    try {
+      if (perso.fontFamily && fontSet?.load) {
+        await fontSet.load(`400 16px '${perso.fontFamily}'`);
+      }
+      await fontSet?.ready;
+    } catch (err) {
+      console.warn("Font load check failed", err);
+    }
+  }, [perso.fontFamily]);
+
+  const buildFontFileCSS = useCallback(async (): Promise<string | null> => {
+    const active = fonts.find((f) => f.faceName === perso.fontFamily);
+    if (!active?.path) return null;
+    const key = active.faceName;
+    const cached = fontFileCssCache.current.get(key);
+    if (cached) return cached;
+    try {
+      const url = active.path.startsWith("/") ? active.path : `/${active.path}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Font fetch failed (${res.status})`);
+      const buf = await res.arrayBuffer();
+      const b64 = btoa(
+        String.fromCharCode(...Array.from(new Uint8Array(buf)))
+      );
+      const ext = active.path.toLowerCase();
+      const mime = ext.endsWith(".otf") ? "font/otf" : "font/ttf";
+      const css = `@font-face { font-family: '${active.faceName}'; src: url(data:${mime};base64,${b64}) format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }`;
+      fontFileCssCache.current.set(key, css);
+      return css;
+    } catch (err) {
+      console.error("Inline font fetch failed", err);
+      return null;
+    }
+  }, [fonts, perso.fontFamily]);
+
+  const buildFontEmbedCSS = useCallback(
+    async (node: HTMLElement | null): Promise<string | null> => {
+      if (!node) return null;
+      const key = perso.fontFamily || "default";
+      const cached = fontEmbedCache.current.get(key);
+      if (cached) return cached;
+
+      try {
+        await ensureFontReady();
+        const css = await htmlToImage.getFontEmbedCSS(node, {
+          preferredFontFormat: "truetype",
+        });
+        let resultCss = css?.trim() || null;
+        // If the helper did not embed the active font, fall back to manual inline data URL
+        if (!resultCss || (perso.fontFamily && !resultCss.includes(perso.fontFamily))) {
+          const fallbackCss = await buildFontFileCSS();
+          resultCss = [resultCss, fallbackCss].filter(Boolean).join("\n") || null;
+        }
+        if (resultCss) {
+          fontEmbedCache.current.set(key, resultCss);
+        }
+        return resultCss;
+      } catch (err) {
+        console.error("Unable to build font CSS", err);
+        return null;
+      }
+    },
+    [buildFontFileCSS, ensureFontReady, perso.fontFamily]
+  );
+
   const wrapperMaxW =
     perso.pageWidth === "narrow"
       ? "max-w-2xl"
@@ -352,7 +444,10 @@ export default function RichTextEditor(): React.ReactElement {
       ? "max-w-6xl"
       : "max-w-4xl";
 
-  const wrapHtmlForDownload = (innerHtml: string): string => {
+  const wrapHtmlForDownload = (
+    innerHtml: string,
+    fontEmbedCSS?: string | null
+  ): string => {
     const font = getResolvedFontFamily();
     const bg = perso.theme === "dark" ? "#111827" : "#ffffff";
     const textColor = perso.theme === "dark" ? "#f3f4f6" : "#111827";
@@ -361,6 +456,7 @@ export default function RichTextEditor(): React.ReactElement {
 <head>
   <meta charset="UTF-8" />
   <style>
+    ${fontEmbedCSS?.trim() ? `${fontEmbedCSS}\n` : ""}
     body {
       font-family: ${font};
       font-size: ${perso.fontSize}px;
@@ -378,13 +474,24 @@ export default function RichTextEditor(): React.ReactElement {
 </html>`;
   };
 
-  const exportHTML = () => {
+  const exportHTML = async () => {
     const html = getHtmlForExport();
     if (!html.trim()) {
       alert("Nothing to export.");
       return;
     }
-    const wrapped = wrapHtmlForDownload(html);
+    const { node, cleanup } = getNodeForCapture(html);
+    let fontEmbedCSS: string | null = null;
+    try {
+      if (!document.body.contains(node)) {
+        document.body.appendChild(node);
+      }
+      fontEmbedCSS = await buildFontEmbedCSS(node);
+    } catch (err) {
+      console.error("Unable to prepare fonts for HTML export", err);
+    }
+    const wrapped = wrapHtmlForDownload(html, fontEmbedCSS);
+    cleanup?.();
     const blob = new Blob([wrapped], { type: "text/html;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
@@ -452,7 +559,7 @@ export default function RichTextEditor(): React.ReactElement {
     };
   };
 
-  const exportPng = async () => {
+  const exportImage = async (type: "png" | "jpeg") => {
     const html = getHtmlForExport();
     if (!html.trim()) {
       alert("Nothing to export.");
@@ -467,75 +574,42 @@ export default function RichTextEditor(): React.ReactElement {
       if (!document.body.contains(node)) {
         document.body.appendChild(node);
       }
-      // Ensure fonts are loaded; skipFonts avoids problematic font parsing/embedding
-      type FontFaceSetLike = { ready?: Promise<void> };
-      const fontSet = (document as Document & { fonts?: FontFaceSetLike })
-        .fonts;
-      await fontSet?.ready;
-      const dataUrl = await htmlToImage.toPng(node, {
+      await ensureFontReady();
+      const fontEmbedCSS = await buildFontEmbedCSS(node);
+      const commonOptions = {
         backgroundColor: bg,
         cacheBust: true,
         pixelRatio: 2,
+        preferredFontFormat: "truetype" as const,
+        fontEmbedCSS: fontEmbedCSS || undefined,
         style: {
           fontFamily: resolvedFont,
           // Ensure consistent DPI sizing
           transform: "scale(1)",
           transformOrigin: "top left",
         },
-      });
+      };
+      const dataUrl =
+        type === "png"
+          ? await htmlToImage.toPng(node, commonOptions)
+          : await htmlToImage.toJpeg(node, {
+              ...commonOptions,
+              quality: 0.95,
+            });
       const a = document.createElement("a");
       a.href = dataUrl;
-      a.download = "document.png";
+      a.download = type === "png" ? "document.png" : "document.jpg";
       a.click();
       restoreFont();
       cleanup?.();
     } catch (err) {
-      console.error("Export PNG failed", err);
-      alert("Export PNG failed. Try changing font or theme, then retry.");
-      restoreFont();
-      cleanup?.();
-    }
-  };
-
-  const exportJpeg = async () => {
-    const html = getHtmlForExport();
-    if (!html.trim()) {
-      alert("Nothing to export.");
-      return;
-    }
-    const { node, cleanup } = getNodeForCapture(html);
-    const bg = perso.theme === "dark" ? "#111827" : "#ffffff";
-    const resolvedFont = getResolvedFontFamily();
-    const restoreFont = applyCaptureFont(node, resolvedFont);
-    try {
-      if (!document.body.contains(node)) {
-        document.body.appendChild(node);
-      }
-      type FontFaceSetLike = { ready?: Promise<void> };
-      const fontSet = (document as Document & { fonts?: FontFaceSetLike })
-        .fonts;
-      await fontSet?.ready;
-      const dataUrl = await htmlToImage.toJpeg(node, {
-        backgroundColor: bg,
-        cacheBust: true,
-        quality: 0.95,
-        pixelRatio: 2,
-        style: {
-          fontFamily: resolvedFont,
-          transform: "scale(1)",
-          transformOrigin: "top left",
-        },
-      });
-      const a = document.createElement("a");
-      a.href = dataUrl;
-      a.download = "document.jpg";
-      a.click();
-      restoreFont();
-      cleanup?.();
-    } catch (err) {
-      console.error("Export JPG failed", err);
-      alert("Export JPG failed. Try changing font or theme, then retry.");
-      // ensure cleanup
+      console.error(
+        `Export ${type.toUpperCase()} failed (fonts may be missing)`,
+        err
+      );
+      alert(
+        `Export ${type.toUpperCase()} failed. Try changing font or theme, then retry.`
+      );
       restoreFont();
       cleanup?.();
     }
@@ -556,6 +630,20 @@ export default function RichTextEditor(): React.ReactElement {
     printTarget.style.padding = "24px";
     printTarget.innerHTML = html;
     document.body.appendChild(printTarget);
+    let fontEmbedStyle: HTMLStyleElement | null = null;
+
+    try {
+      await ensureFontReady();
+      const fontEmbedCSS = await buildFontEmbedCSS(printTarget);
+      if (fontEmbedCSS?.trim()) {
+        fontEmbedStyle = document.createElement("style");
+        fontEmbedStyle.setAttribute("data-print-fonts", "true");
+        fontEmbedStyle.textContent = fontEmbedCSS;
+        document.head.appendChild(fontEmbedStyle);
+      }
+    } catch (err) {
+      console.warn("Could not inline fonts for print", err);
+    }
 
     // Inject print stylesheet to isolate target and set page options
     const style = document.createElement("style");
@@ -588,6 +676,9 @@ export default function RichTextEditor(): React.ReactElement {
     const cleanup = () => {
       if (document.head.contains(style)) {
         document.head.removeChild(style);
+      }
+      if (fontEmbedStyle && document.head.contains(fontEmbedStyle)) {
+        document.head.removeChild(fontEmbedStyle);
       }
       if (document.body.contains(printTarget)) {
         document.body.removeChild(printTarget);
@@ -989,14 +1080,14 @@ export default function RichTextEditor(): React.ReactElement {
             <button
               type="button"
               className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
-              onClick={exportPng}
+              onClick={() => exportImage("png")}
             >
               Export PNG
             </button>
             <button
               type="button"
               className="px-3 py-1 mr-2 rounded-md border border-gray-300 bg-white text-sm"
-              onClick={exportJpeg}
+              onClick={() => exportImage("jpeg")}
             >
               Export JPG
             </button>

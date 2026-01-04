@@ -180,7 +180,7 @@ export default function Home(): React.ReactElement {
         />
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-3">
-          <label className="inline-flex gap-2 items-center justify-center text-center py-[0.6rem] px-[0.9rem] bg-(--color-accent-cta) border border-[rgba(0,0,0,0.06)] rounded-xl cursor-pointer text-[#111827] text-[0.98rem] w-full sm:w-auto">
+          <label className="inline-flex gap-2 items-center justify-center text-center py-[0.6rem] px-[0.9rem] bg-(--color-accent-cta) border border-[rgba(0,0,0,0.06)] rounded-xl cursor-pointer text-[#fefefe] text-[0.98rem] w-full sm:w-auto">
             <input
               type="file"
               accept=".pdf,.docx,.txt,image/*"

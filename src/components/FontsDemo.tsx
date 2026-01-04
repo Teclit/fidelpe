@@ -455,7 +455,7 @@ export default function FontsDemo() {
               />
             </svg>
             <span className="text-lg font-semibold text-gray-900">
-              Browse & download fonts by city
+              Browse and Download Font Collections
             </span>
           </div>
           {selectedCity && (

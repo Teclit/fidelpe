@@ -393,13 +393,24 @@ export default function RichTextEditor(): React.ReactElement {
     return node;
   };
 
+  const getNodeForCapture = (
+    html: string
+  ): { node: HTMLElement; cleanup?: () => void } => {
+    if (captureRef.current) {
+      // Use the live editor DOM to guarantee we capture current content/styles
+      return { node: captureRef.current };
+    }
+    const node = buildOffscreenNodeFromSaved(html);
+    return { node, cleanup: () => node.remove() };
+  };
+
   const exportPng = async () => {
     const html = getHtmlForExport();
     if (!html.trim()) {
       alert("Nothing to export.");
       return;
     }
-    const node = buildOffscreenNodeFromSaved(html);
+    const { node, cleanup } = getNodeForCapture(html);
     const bg = perso.theme === "dark" ? "#111827" : "#ffffff";
     const resolvedFont = perso.fontFamily
       ? `'${perso.fontFamily}', serif`
@@ -428,11 +439,11 @@ export default function RichTextEditor(): React.ReactElement {
       a.href = dataUrl;
       a.download = "document.png";
       a.click();
-      node.remove();
+      cleanup?.();
     } catch (err) {
       console.error("Export PNG failed", err);
       alert("Export PNG failed. Try changing font or theme, then retry.");
-      node.remove();
+      cleanup?.();
     }
   };
 
@@ -442,7 +453,7 @@ export default function RichTextEditor(): React.ReactElement {
       alert("Nothing to export.");
       return;
     }
-    const node = buildOffscreenNodeFromSaved(html);
+    const { node, cleanup } = getNodeForCapture(html);
     const bg = perso.theme === "dark" ? "#111827" : "#ffffff";
     const resolvedFont = perso.fontFamily
       ? `'${perso.fontFamily}', serif`
@@ -470,14 +481,12 @@ export default function RichTextEditor(): React.ReactElement {
       a.href = dataUrl;
       a.download = "document.jpg";
       a.click();
-      node.remove();
+      cleanup?.();
     } catch (err) {
       console.error("Export JPG failed", err);
       alert("Export JPG failed. Try changing font or theme, then retry.");
       // ensure cleanup
-      if (document.body.contains(node)) {
-        node.remove();
-      }
+      cleanup?.();
     }
   };
 

@@ -19,8 +19,8 @@ export default function Sidebar(): React.ReactElement {
   const pathname = usePathname();
 
   const navItems: NavItem[] = [
-    { href: "/", label: "Home", mobileLabel: "Accueil" },
-    { href: "/fonts-demo", label: "Geez Fonts", mobileLabel: "Fonts demo" },
+    { href: "/", label: "Home", mobileLabel: "Home" },
+    { href: "/fonts-demo", label: "Geez Fonts", mobileLabel: "Geez Fonts" },
     { href: "/geez", label: "Geez alphabet" },
     { href: "/aetd", label: "AETD Dictionary" },
     { href: "/extract", label: "Text Extractor" },

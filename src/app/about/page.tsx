@@ -47,12 +47,6 @@ const actions = [
   },
 ];
 
-const values = [
-  "Simple first: every screen should make sense on the first try.",
-  "Low friction: minimal steps, friendly defaults, and no surprises.",
-  "Accessible language: concise labels and short helper text.",
-  "Open usage: you can reuse the fonts and content for non-profit needs.",
-];
 
 export default function AboutPage() {
   return (

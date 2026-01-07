@@ -1,16 +1,5 @@
 import TigrinyaAlphabet from "@/components/TigrinyaAlphabet";
 
-const practiceTips = [
-  "Read each row aloud, then whisper it to focus on the vowel changes.",
-  "Pair every Geez symbol with a familiar word (name, place, food).",
-  "Switch to grid view after two rounds to compare similar consonants.",
-];
-
-const quickUses = [
-  "Teach a 5-minute warm-up before lessons or calls with family.",
-  "Print the grid view as a compact reference sheet.",
-  "Use the carousel on a phone for slow, single-row review.",
-];
 
 export default function GeezPage(): React.ReactElement {
   return (

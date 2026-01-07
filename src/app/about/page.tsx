@@ -40,13 +40,7 @@ const actions = [
     title: "Document editor",
     detail: "Format and export notes without leaving the browser.",
   },
-  {
-    href: "/learn-tigrinya",
-    title: "Learn Tigrinya",
-    detail: "Daily routine, phrases, and mini tasks to practice consistently.",
-  },
 ];
-
 
 export default function AboutPage() {
   return (

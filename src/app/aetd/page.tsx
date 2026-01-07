@@ -132,7 +132,7 @@ export default function AetdPage(): React.ReactElement {
             </h1>
             <p className="text-(--color-text-muted) mt-2 text-sm sm:text-base leading-relaxed">
               Search the offline dictionary for quick English ⇄ Tigrinya
-              lookups. Data loads on first search (≈8 MB) and stays in memory.
+              lookups.
             </p>
           </div>
           <div className="flex gap-3 flex-wrap text-sm text-(--color-text-muted) items-center">
@@ -154,7 +154,7 @@ export default function AetdPage(): React.ReactElement {
               htmlFor="query"
               className="block text-sm font-semibold text-(--color-primary) mb-2"
             >
-              Search term
+              What would you like to look up?
             </label>
             <input
               id="query"
@@ -233,7 +233,9 @@ export default function AetdPage(): React.ReactElement {
                 </div>
               </div>
               <div className="flex flex-col gap-2 rounded-xl border border-[rgba(17,24,39,0.08)] bg-(--color-secondary) p-3">
-                <p className="font-semibold text-(--color-primary)">Match type</p>
+                <p className="font-semibold text-(--color-primary)">
+                  Match type
+                </p>
                 <div className="flex flex-wrap gap-3">
                   <label className="inline-flex items-center gap-2 cursor-pointer">
                     <input

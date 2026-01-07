@@ -1,6 +1,6 @@
 "use client";
 
-import { tsoronaAsmara } from "@/app/page";
+import { tsoronaAsmara } from "@/app/extract/page";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useCallback, useState } from "react";
@@ -23,7 +23,7 @@ export default function Sidebar(): React.ReactElement {
     { href: "/fonts-demo", label: "Geez Fonts", mobileLabel: "Fonts demo" },
     { href: "/geez", label: "Geez alphabet" },
     { href: "/aetd", label: "AETD Dictionary" },
-    { href: "/editor", label: "Text Editor" },
+    { href: "/extract", label: "Text Extractor" },
     { href: "/acknowledgement", label: "Acknowledgement" },
     { href: "/about", label: "About" },
   ];

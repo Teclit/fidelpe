@@ -13,7 +13,8 @@ const highlights = [
   },
   {
     title: "Support local scripts",
-    detail: "Use Geez-friendly fonts and layouts that handle Tigrinya comfortably.",
+    detail:
+      "Use Geez-friendly fonts and layouts that handle Tigrinya comfortably.",
   },
 ];
 
@@ -21,7 +22,8 @@ const actions = [
   {
     href: "/",
     title: "Simplify text",
-    detail: "Paste or upload and get a clearer version for sharing or printing.",
+    detail:
+      "Paste or upload and get a clearer version for sharing or printing.",
   },
   {
     href: "/aetd",
@@ -62,12 +64,12 @@ export default function AboutPage() {
             About
           </p>
           <h1 className="text-3xl sm:text-4xl font-bold text-(--color-primary)">
-            Why we built FidelpeExtractX
+            Why we built FidelPE
           </h1>
           <p className="text-(--color-text-muted) text-base sm:text-lg leading-relaxed max-w-4xl">
-            FidelpeExtractX is a small toolkit for people who are not comfortable with
-            digital technology. It focuses on making text clearer, offering helpful
-            fonts, and keeping Tigrinya learning resources in one place.
+            FidelPE is a small toolkit for people who are not comfortable with
+            digital technology. It focuses on making text clearer, offering
+            helpful fonts, and keeping Tigrinya learning resources in one place.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {highlights.map((item) => (
@@ -125,87 +127,6 @@ export default function AboutPage() {
             </Link>
           ))}
         </div>
-      </section>
-
-      <section className="rounded-2xl border border-[rgba(17,24,39,0.06)] bg-white p-5 sm:p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-(--color-text-muted)">
-              Approach
-            </p>
-            <h2 className="text-xl sm:text-2xl font-semibold text-(--color-primary)">
-              How we design features
-            </h2>
-          </div>
-          <span className="text-sm px-3 py-2 rounded-xl bg-(--color-secondary) border border-(--card-border) text-(--color-primary-dark)">
-            For beginners and helpers alike
-          </span>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <article className="rounded-xl border border-[rgba(17,24,39,0.06)] bg-(--color-secondary) p-4">
-            <h3 className="text-base font-semibold text-(--color-primary) mb-2">
-              Guided first steps
-            </h3>
-            <p className="text-sm text-(--color-text-dark) leading-relaxed">
-              Each page starts with a plain-language intro, friendly defaults, and no
-              required setup. We aim for “finish in one visit” experiences.
-            </p>
-          </article>
-          <article className="rounded-xl border border-[rgba(17,24,39,0.06)] bg-(--color-secondary) p-4">
-            <h3 className="text-base font-semibold text-(--color-primary) mb-2">
-              Works on basic devices
-            </h3>
-            <p className="text-sm text-(--color-text-dark) leading-relaxed">
-              Lightweight pages, offline-friendly dictionary, and font previews that
-              do not force heavy downloads unless you choose them.
-            </p>
-          </article>
-          <article className="rounded-xl border border-[rgba(17,24,39,0.06)] bg-(--color-secondary) p-4">
-            <h3 className="text-base font-semibold text-(--color-primary) mb-2">
-              Clear printing
-            </h3>
-            <p className="text-sm text-(--color-text-dark) leading-relaxed">
-              Fonts, spacing, and contrast are picked to print cleanly so you can share
-              worksheets and notes offline.
-            </p>
-          </article>
-          <article className="rounded-xl border border-[rgba(17,24,39,0.06)] bg-(--color-secondary) p-4">
-            <h3 className="text-base font-semibold text-(--color-primary) mb-2">
-              Privacy by default
-            </h3>
-            <p className="text-sm text-(--color-text-dark) leading-relaxed">
-              Text you paste stays in your session; nothing is sent elsewhere unless a
-              feature clearly asks for it.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-[rgba(17,24,39,0.06)] bg-white p-5 sm:p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-(--color-text-muted)">
-              Principles
-            </p>
-            <h2 className="text-xl sm:text-2xl font-semibold text-(--color-primary)">
-              Commitments to our users
-            </h2>
-          </div>
-          <span className="text-sm px-3 py-2 rounded-xl bg-(--color-secondary) text-(--color-primary-dark) border border-(--card-border)">
-            Built for people, not just features
-          </span>
-        </div>
-        <ul className="space-y-2 text-(--color-text-dark) text-sm leading-relaxed">
-          {values.map((value) => (
-            <li
-              key={value}
-              className="flex items-start gap-2 rounded-lg bg-(--color-secondary) px-3 py-2 border border-[rgba(17,24,39,0.06)]"
-            >
-              <span className="mt-0.5 h-2 w-2 rounded-full bg-(--color-accent)" />
-              <span>{value}</span>
-            </li>
-          ))}
-        </ul>
       </section>
     </div>
   );

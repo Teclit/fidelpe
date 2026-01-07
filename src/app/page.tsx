@@ -151,10 +151,10 @@ export default function Home(): React.ReactElement {
         <h1
           className={`${tsoronaAsmara.className} font-bold text-2xl sm:text-3xl md:text-4xl leading-tight text-(--color-primary) mb-2`}
         >
-          ፊደልፐ ምስ ጽሑፋት
+          ፊደልፐ ምስ ግእዝ
         </h1>
         <h1 className="text-sm sm:text-base text-(--color-primary) mb-2">
-          FidelpeExtractX — Make texts easy
+          FidelPE — Make texts easy
         </h1>
         <p className="m-0 text-(--color-text-muted) text-xs sm:text-base md:text-lg leading-[1.45]">
           This tool is for people who don&rsquo;t often use digital tools. Copy
@@ -252,8 +252,8 @@ export default function Home(): React.ReactElement {
       )}
 
       <footer className="text-center text-(--color-text-muted) text-[0.95rem] mt-auto">
-        © {new Date().getFullYear()} FidelpeExtractX — For people not
-        comfortable with digital technology.
+        © {new Date().getFullYear()} FidelPE — For people not comfortable with
+        digital technology.
       </footer>
     </main>
   );

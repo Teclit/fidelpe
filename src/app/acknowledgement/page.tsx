@@ -31,9 +31,9 @@ export default function AcknowledgementPage() {
             Gratitude to the people behind this work
           </h1>
           <p className="text-(--color-text-muted) text-base sm:text-lg leading-relaxed max-w-4xl">
-            FidelpeExtractX exists because many hands keep Geez-script languages alive
-            in digital spaces. This page honors the individuals and communities who
-            build, teach, and share.
+            FidelPE exists because many hands keep Geez-script languages alive
+            in digital spaces. This page honors the individuals and communities
+            who build, teach, and share.
           </p>
         </div>
       </section>
@@ -70,7 +70,8 @@ export default function AcknowledgementPage() {
         </div>
         <div className="rounded-xl border border-[rgba(17,24,39,0.06)] bg-(--color-secondary) p-4 flex flex-col gap-2">
           <p className="text-(--color-text-dark) text-sm">
-            A video honoring Tekie Tesfay and everyone advancing Geez-script languages.
+            A video honoring Tekie Tesfay and everyone advancing Geez-script
+            languages.
           </p>
           <Link
             href="https://youtu.be/9023azbD-fI"

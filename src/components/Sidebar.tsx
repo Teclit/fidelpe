@@ -20,11 +20,10 @@ export default function Sidebar(): React.ReactElement {
 
   const navItems: NavItem[] = [
     { href: "/", label: "Home", mobileLabel: "Accueil" },
-    { href: "/learn-tigrinya", label: "Learn Tigrinya" },
+    { href: "/fonts-demo", label: "Geez Fonts", mobileLabel: "Fonts demo" },
     { href: "/geez", label: "Geez alphabet" },
     { href: "/aetd", label: "AETD Dictionary" },
-    { href: "/fonts-demo", label: "Fonts", mobileLabel: "Fonts demo" },
-    { href: "/editor", label: "Editor" },
+    { href: "/editor", label: "Text Editor" },
     { href: "/acknowledgement", label: "Acknowledgement" },
     { href: "/about", label: "About" },
   ];
@@ -67,7 +66,7 @@ export default function Sidebar(): React.ReactElement {
               <h2
                 className={`${tsoronaAsmara.className} font-bold text-(--color-primary)`}
               >
-                ፊደልፐ ምስ ጽሑፋት
+                ፊደልፐ ምስ ግእዝ
               </h2>
               <button
                 type="button"
@@ -111,7 +110,7 @@ export default function Sidebar(): React.ReactElement {
           <h2
             className={`${tsoronaAsmara.className} text-3xl font-bold text-(--color-primary)`}
           >
-            ፊደልፐ ምስ ጽሑፋት
+            ፊደልፐ ምስ ግእዝ
           </h2>
         </div>
         <nav className="space-y-4 w-full mb-4">

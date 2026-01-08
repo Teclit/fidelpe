@@ -24,7 +24,7 @@ export default function FontsDemo() {
   const [cityMap, setCityMap] = useState<CityMap>({});
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [selectedFont, setSelectedFont] = useState<string>("");
-  const [previewText, setPreviewText] = useState<string>("ሰላም ብጾት");
+  const [previewText, setPreviewText] = useState<string>("ሰላም ብጾት! ብሩክ መዓልቲ");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>(
@@ -410,7 +410,9 @@ export default function FontsDemo() {
                   id="textInput"
                   type="text"
                   value={previewText}
-                  onChange={(e) => setPreviewText(e.target.value || "ሰላም ብጾት")}
+                  onChange={(e) =>
+                    setPreviewText(e.target.value || "ሰላም ብጾት! ብሩክ መዓልቲ")
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>

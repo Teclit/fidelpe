@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { sanitizeFontFaceName } from "@/lib/fonts";
 
 interface Font {
@@ -38,22 +38,39 @@ export default function FontsDemo() {
 
   // Load fonts configuration
   useEffect(() => {
-    setLoading(true);
-    setError("");
+    let active = true;
 
-    Promise.all([
-      fetch("/fonts.min.json").then((res) => {
-        if (!res.ok)
-          throw new Error(`Failed to fetch fonts.min.json: ${res.status}`);
-        return res.json();
-      }),
-      fetch("/city_name.json").then((res) => {
-        if (!res.ok)
-          throw new Error(`Failed to fetch city_name.json: ${res.status}`);
-        return res.json();
-      }),
-    ])
-      .then(([fontsData, cityData]) => {
+    const loadFonts = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const [fontsRes, cityRes] = await Promise.all([
+          fetch("/fonts.min.json"),
+          fetch("/city_name.json"),
+        ]);
+
+        if (!fontsRes.ok) {
+          if (active) {
+            setError(`Failed to fetch fonts.min.json: ${fontsRes.status}`);
+            setLoading(false);
+          }
+          return;
+        }
+
+        if (!cityRes.ok) {
+          if (active) {
+            setError(`Failed to fetch city_name.json: ${cityRes.status}`);
+            setLoading(false);
+          }
+          return;
+        }
+
+        const fontsData = await fontsRes.json();
+        const cityData = await cityRes.json();
+
+        if (!active) return;
+
         const fontsList = fontsData.fonts || [];
         console.log(`Loaded ${fontsList.length} fonts from fonts.min.json`);
 
@@ -79,12 +96,19 @@ export default function FontsDemo() {
         );
 
         setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
+        if (!active) return;
         console.error("Failed to load fonts:", err);
-        setError(`Error loading fonts: ${err.message}`);
+        const message = err instanceof Error ? err.message : "Unknown error";
+        setError(`Error loading fonts: ${message}`);
         setLoading(false);
-      });
+      }
+    };
+
+    loadFonts().catch(() => undefined);
+    return () => {
+      active = false;
+    };
   }, []);
 
   // Dynamically inject @font-face rules

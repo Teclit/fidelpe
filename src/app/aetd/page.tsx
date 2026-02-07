@@ -33,11 +33,13 @@ export default function AetdPage(): React.ReactElement {
       setError("");
       const res = await fetch(DATA_URL);
       if (!res.ok) {
-        throw new Error(`Unable to load dictionary (${res.status})`);
+        setError(`Unable to load dictionary (${res.status})`);
+        return;
       }
       const json = await res.json();
       if (!Array.isArray(json)) {
-        throw new Error("Dictionary payload is not an array");
+        setError("Dictionary payload is not an array");
+        return;
       }
       setEntries(json);
     } catch (err) {
@@ -54,7 +56,9 @@ export default function AetdPage(): React.ReactElement {
       setQuery(value);
       if (value.trim().length >= 2) {
         setHasSearched(true);
-        void loadDictionary();
+        loadDictionary().catch((err) => {
+          console.error("Dictionary load failed", err);
+        });
       }
     },
     [loadDictionary]

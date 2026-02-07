@@ -134,10 +134,14 @@ export default function ExtractPage(): React.ReactElement {
     setFile(null);
   }, []);
 
-  const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(result);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(result);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (err) {
+      console.error("Copy failed", err);
+    }
   }, [result]);
 
   return (

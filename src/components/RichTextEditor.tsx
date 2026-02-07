@@ -200,18 +200,24 @@ export default function RichTextEditor(): React.ReactElement {
 
   useEffect(() => {
     let active = true;
-    setFontsLoading(true);
-    setFontsError(null);
+    const loadFonts = async () => {
+      setFontsLoading(true);
+      setFontsError(null);
 
-    fetch("/fonts.min.json")
-      .then((res) => {
+      try {
+        const res = await fetch("/fonts.min.json");
         if (!res.ok) {
-          throw new Error(`Failed to fetch fonts.min.json (${res.status})`);
+          if (active) {
+            setFonts([]);
+            setFontsLoading(false);
+            setFontsError(`Failed to fetch fonts.min.json (${res.status})`);
+          }
+          return;
         }
-        return res.json();
-      })
-      .then((data: { fonts?: RawFont[] }) => {
+
+        const data: { fonts?: RawFont[] } = await res.json();
         if (!active) return;
+
         const rawFonts = Array.isArray(data.fonts) ? data.fonts : [];
         const list: LoadedFont[] = rawFonts.map((f) => {
           const fileName = (f.file || f.path || "")?.replace(/\.ttf$/i, "");
@@ -230,8 +236,7 @@ export default function RichTextEditor(): React.ReactElement {
           list.length === 0 ? "No fonts found in fonts.min.json" : null
         );
         setFontsLoading(false);
-      })
-      .catch((err: unknown) => {
+      } catch (err: unknown) {
         if (!active) return;
         const message =
           err instanceof Error
@@ -242,7 +247,10 @@ export default function RichTextEditor(): React.ReactElement {
         setFonts([]);
         setFontsLoading(false);
         setFontsError(message);
-      });
+      }
+    };
+
+    loadFonts().catch(() => undefined);
 
     return () => {
       active = false;
@@ -399,7 +407,10 @@ export default function RichTextEditor(): React.ReactElement {
     try {
       const url = active.path.startsWith("/") ? active.path : `/${active.path}`;
       const res = await fetch(url);
-      if (!res.ok) throw new Error(`Font fetch failed (${res.status})`);
+      if (!res.ok) {
+        console.warn(`Font fetch failed (${res.status})`);
+        return null;
+      }
       const buf = await res.arrayBuffer();
       const ext = active.path.toLowerCase();
       const b64 = arrayBufferToBase64(buf);

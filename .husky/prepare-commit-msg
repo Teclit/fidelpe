@@ -1,0 +1,43 @@
+#!/usr/bin/env sh
+
+# Prefix commit message with current branch: "<branch> - type(scope)?: subject"
+
+MSG_FILE="$1"
+SOURCE="$2"
+
+# Skip for merge or squash commits to avoid mangling auto-generated messages
+if [ "$SOURCE" = "merge" ] || [ "$SOURCE" = "squash" ]; then
+  exit 0
+fi
+
+# Determine current branch
+BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+
+# Skip if detached HEAD or branch unavailable
+if [ -z "$BRANCH" ] || [ "$BRANCH" = "HEAD" ]; then
+  exit 0
+fi
+
+# Read the first line of the commit message
+FIRST_LINE="$(head -n 1 "$MSG_FILE")"
+
+# If already prefixed with this exact branch, do nothing
+case "$FIRST_LINE" in
+  "$BRANCH - "*)
+    exit 0
+    ;;
+  *)
+    ;;
+ esac
+
+# Safeguard: if any prefix like "<something> - " already exists at start, skip
+if printf '%s' "$FIRST_LINE" | grep -qE '^[^[:space:]]+ - '; then
+  exit 0
+fi
+
+# Prefix the first line with "<branch> - " and keep the rest intact
+{
+  printf "%s - %s\n" "$BRANCH" "$FIRST_LINE"
+  # Append the rest of the original message starting from line 2, if any
+  tail -n +2 "$MSG_FILE" 2>/dev/null || true
+} > "$MSG_FILE.tmp" && mv "$MSG_FILE.tmp" "$MSG_FILE"

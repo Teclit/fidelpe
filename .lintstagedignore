@@ -1,0 +1,2 @@
+# Files to exclude from lint-staged processing
+next.config.ts

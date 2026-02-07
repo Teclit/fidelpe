@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+# Run lint-staged on staged files only (auto-fix where possible).
+yarn lint-staged

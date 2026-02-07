@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+# Validate commit message using commitlint.
+ROOT_DIR="$(git rev-parse --show-toplevel 2>/dev/null)"
+CONFIG_PATH="$ROOT_DIR/commitlint.config.cjs"
+
+if [ -f "$CONFIG_PATH" ]; then
+  node node_modules/@commitlint/cli/lib/cli.js --config "$CONFIG_PATH" --edit "$1"
+else
+  node node_modules/@commitlint/cli/lib/cli.js --edit "$1"
+fi

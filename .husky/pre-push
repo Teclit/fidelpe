@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+# Fast checks before push; keep lean to avoid blocking pushes too long.
+# 1) Lint all workspaces.
+# 2) Optional: run unit tests (skip if you prefer speed).
+
+# Lint
+yarn -s lint
+
+# Uncomment to enforce tests before push
+# yarn -s test

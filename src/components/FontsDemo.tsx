@@ -16,6 +16,56 @@ interface CityMap {
   [key: string]: string;
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const isString = (value: unknown): value is string => typeof value === "string";
+
+const parseFontsPayload = (payload: unknown): Font[] | null => {
+  if (!isRecord(payload)) return null;
+  const rawFonts = payload.fonts;
+  if (!Array.isArray(rawFonts)) return null;
+
+  const parsed: Font[] = [];
+  rawFonts.forEach((item) => {
+    if (!isRecord(item)) return;
+    if (
+      !isString(item.path) ||
+      !isString(item.city) ||
+      !isString(item.file) ||
+      !isString(item.family) ||
+      !isString(item.subfamily) ||
+      !isString(item.full_name)
+    ) {
+      return;
+    }
+
+    parsed.push({
+      path: item.path,
+      city: item.city,
+      file: item.file,
+      family: item.family,
+      subfamily: item.subfamily,
+      full_name: item.full_name,
+    });
+  });
+
+  return parsed;
+};
+
+const parseCityMap = (payload: unknown): CityMap | null => {
+  if (!isRecord(payload)) return null;
+  const cityMap: CityMap = {};
+
+  Object.entries(payload).forEach(([key, value]) => {
+    if (isString(value)) {
+      cityMap[key] = value;
+    }
+  });
+
+  return cityMap;
+};
+
 /**
  * Geez Fonts Demonstration Component
  * Displays fonts organized by city with live preview and controls
@@ -66,12 +116,19 @@ export default function FontsDemo() {
           return;
         }
 
-        const fontsData = await fontsRes.json();
-        const cityData = await cityRes.json();
+        const fontsData: unknown = await fontsRes.json();
+        const cityData: unknown = await cityRes.json();
 
         if (!active) return;
 
-        const fontsList = fontsData.fonts || [];
+        const fontsList = parseFontsPayload(fontsData);
+        if (!fontsList) {
+          setError("Fonts payload is invalid");
+          setLoading(false);
+          return;
+        }
+
+        const cityLookup = parseCityMap(cityData) ?? {};
         console.log(`Loaded ${fontsList.length} fonts from fonts.min.json`);
 
         if (fontsList.length === 0) {
@@ -81,7 +138,7 @@ export default function FontsDemo() {
         }
 
         setFonts(fontsList);
-        setCityMap(cityData);
+        setCityMap(cityLookup);
 
         // Set initial city and font
         const firstCity = fontsList[0].city;

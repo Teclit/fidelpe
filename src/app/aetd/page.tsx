@@ -15,6 +15,32 @@ type DictionaryEntry = {
 const DATA_URL = "/EnglishTigrigna/AdvancedEnglishTigrinyaDictionary.json";
 type SearchScope = "headword" | "all";
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const isString = (value: unknown): value is string => typeof value === "string";
+
+const parseDictionaryEntries = (payload: unknown): DictionaryEntry[] | null => {
+  if (!Array.isArray(payload)) return null;
+
+  const entries: DictionaryEntry[] = [];
+  payload.forEach((item) => {
+    if (!isRecord(item)) return;
+    if (!isString(item.entry) || !isString(item.def)) return;
+
+    entries.push({
+      entry: item.entry,
+      def: item.def,
+      parentid: typeof item.parentid === "number" ? item.parentid : undefined,
+      partofsp: isString(item.partofsp) ? item.partofsp : undefined,
+      pronunc: isString(item.pronunc) ? item.pronunc : undefined,
+      supportinfo: isString(item.supportinfo) ? item.supportinfo : undefined,
+    });
+  });
+
+  return entries;
+};
+
 export default function AetdPage(): React.ReactElement {
   const [query, setQuery] = useState("");
   const [entries, setEntries] = useState<DictionaryEntry[] | null>(null);
@@ -36,12 +62,17 @@ export default function AetdPage(): React.ReactElement {
         setError(`Unable to load dictionary (${res.status})`);
         return;
       }
-      const json = await res.json();
-      if (!Array.isArray(json)) {
+      const json: unknown = await res.json();
+      const parsed = parseDictionaryEntries(json);
+      if (!parsed) {
         setError("Dictionary payload is not an array");
         return;
       }
-      setEntries(json);
+      if (parsed.length === 0) {
+        setError("Dictionary payload is empty or invalid");
+        return;
+      }
+      setEntries(parsed);
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Unknown error while loading";

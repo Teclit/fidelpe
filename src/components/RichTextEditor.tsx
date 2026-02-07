@@ -60,6 +60,84 @@ const DEFAULT_PERSO: Personalization = {
 const STORAGE_KEY_CONTENT = "editor.document.html";
 const STORAGE_KEY_PERSO = "editor.perso";
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const isString = (value: unknown): value is string => typeof value === "string";
+
+const isNumber = (value: unknown): value is number =>
+  typeof value === "number" && Number.isFinite(value);
+
+const parsePerso = (raw: string): Partial<Personalization> => {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!isRecord(parsed)) return {};
+
+    const next: Partial<Personalization> = {};
+    if (parsed.theme === "light" || parsed.theme === "dark") {
+      next.theme = parsed.theme;
+    }
+
+    const fontFamily = isString(parsed.fontFamily)
+      ? parsed.fontFamily
+      : isString(parsed.fontVar)
+      ? parsed.fontVar
+      : undefined;
+    if (fontFamily) next.fontFamily = fontFamily;
+
+    if (isNumber(parsed.fontSize)) next.fontSize = parsed.fontSize;
+    if (isNumber(parsed.lineHeight)) next.lineHeight = parsed.lineHeight;
+
+    if (
+      parsed.pageWidth === "narrow" ||
+      parsed.pageWidth === "normal" ||
+      parsed.pageWidth === "wide"
+    ) {
+      next.pageWidth = parsed.pageWidth;
+    }
+
+    if (parsed.pageSize === "A4" || parsed.pageSize === "Letter") {
+      next.pageSize = parsed.pageSize;
+    }
+
+    if (
+      parsed.orientation === "portrait" ||
+      parsed.orientation === "landscape"
+    ) {
+      next.orientation = parsed.orientation;
+    }
+
+    if (
+      parsed.printMargin === "small" ||
+      parsed.printMargin === "normal" ||
+      parsed.printMargin === "large"
+    ) {
+      next.printMargin = parsed.printMargin;
+    }
+
+    return next;
+  } catch {
+    return {};
+  }
+};
+
+const parseFontPayload = (payload: unknown): RawFont[] => {
+  if (!isRecord(payload)) return [];
+  const fonts = payload.fonts;
+  if (!Array.isArray(fonts)) return [];
+
+  return fonts
+    .filter(isRecord)
+    .map((font) => ({
+      path: isString(font.path) ? font.path : undefined,
+      city: isString(font.city) ? font.city : undefined,
+      file: isString(font.file) ? font.file : undefined,
+      family: isString(font.family) ? font.family : undefined,
+      subfamily: isString(font.subfamily) ? font.subfamily : undefined,
+      full_name: isString(font.full_name) ? font.full_name : undefined,
+    }));
+};
+
 const arrayBufferToBase64 = (buf: ArrayBuffer): string => {
   const bytes = new Uint8Array(buf);
   const chunk = 0x8000;
@@ -149,9 +227,8 @@ export default function RichTextEditor(): React.ReactElement {
     try {
       const raw = localStorage.getItem(STORAGE_KEY_PERSO);
       if (!raw) return base;
-      const parsed = JSON.parse(raw);
-      const fontFamily = parsed.fontFamily || parsed.fontVar || base.fontFamily;
-      return { ...base, ...parsed, fontFamily };
+      const parsed = parsePerso(raw);
+      return { ...base, ...parsed };
     } catch {
       return base;
     }
@@ -215,10 +292,10 @@ export default function RichTextEditor(): React.ReactElement {
           return;
         }
 
-        const data: { fonts?: RawFont[] } = await res.json();
+        const data: unknown = await res.json();
         if (!active) return;
 
-        const rawFonts = Array.isArray(data.fonts) ? data.fonts : [];
+        const rawFonts = parseFontPayload(data);
         const list: LoadedFont[] = rawFonts.map((f) => {
           const fileName = (f.file || f.path || "")?.replace(/\.ttf$/i, "");
           return {

@@ -1,6 +1,6 @@
 "use client";
 
-import { tsoronaAsmara } from "@/app/extract/page";
+import { tsoronaAsmara } from "@/lib/fonts";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useCallback, useState } from "react";

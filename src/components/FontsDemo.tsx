@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import { sanitizeFontFaceName } from "@/lib/fonts";
 
 interface Font {
   path: string;
@@ -34,11 +35,6 @@ export default function FontsDemo() {
       grid: false,
     }
   );
-
-  // Helper function to sanitize font name - moved up to use in useEffect
-  const sanitizeName = (str: string): string => {
-    return "Geez_" + str.replace(/[^a-zA-Z0-9_\-]/g, "_");
-  };
 
   // Load fonts configuration
   useEffect(() => {
@@ -74,7 +70,7 @@ export default function FontsDemo() {
         const firstCity = fontsList[0].city;
         setSelectedCity(firstCity);
         setSelectedFont(
-          sanitizeName(
+          sanitizeFontFaceName(
             (fontsList[0].file || fontsList[0].path || "").replace(
               /\.ttf$/i,
               ""
@@ -106,7 +102,7 @@ export default function FontsDemo() {
 
     const rules = fonts
       .map((f) => {
-        const faceName = sanitizeName(
+        const faceName = sanitizeFontFaceName(
           (f.file || f.path || "").replace(/\.ttf$/i, "")
         );
         return `@font-face { font-family: "${faceName}"; src: url('/${f.path}') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }`;
@@ -267,7 +263,7 @@ export default function FontsDemo() {
                 const cityFontsPreview = fontsByCity.get(city) || [];
                 const firstFont = cityFontsPreview[0];
                 if (!firstFont) return null;
-                const faceName = sanitizeName(
+                const faceName = sanitizeFontFaceName(
                   (firstFont.file || firstFont.path || "").replace(
                     /\.ttf$/i,
                     ""
@@ -353,7 +349,7 @@ export default function FontsDemo() {
                     const newCityFonts = fontsByCity.get(e.target.value) || [];
                     if (newCityFonts.length > 0) {
                       setSelectedFont(
-                        sanitizeName(
+                        sanitizeFontFaceName(
                           (
                             newCityFonts[0].file ||
                             newCityFonts[0].path ||
@@ -387,7 +383,7 @@ export default function FontsDemo() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   {cityFonts.map((f) => {
-                    const faceName = sanitizeName(
+                    const faceName = sanitizeFontFaceName(
                       (f.file || f.path || "").replace(/\.ttf$/i, "")
                     );
                     return (
@@ -475,7 +471,7 @@ export default function FontsDemo() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {cityFonts.map((f) => {
-                const faceName = sanitizeName(
+                const faceName = sanitizeFontFaceName(
                   (f.file || f.path || "").replace(/\.ttf$/i, "")
                 );
 

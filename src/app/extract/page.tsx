@@ -1,13 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import localFont from "next/font/local";
-
-export const tsoronaAsmara = localFont({
-  // Font sits in project public/fonts/Tsorona
-  src: "../../../public/fonts/Tsorona/TsoronaAsmara-Regular.ttf",
-  variable: "--font-tsorona-asmat",
-});
+import { tsoronaAsmara } from "@/lib/fonts";
 
 export default function ExtractPage(): React.ReactElement {
   const [text, setText] = useState("");

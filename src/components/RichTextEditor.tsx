@@ -18,6 +18,7 @@ import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
 import FontFamily from "@tiptap/extension-font-family";
 import * as htmlToImage from "html-to-image";
+import { sanitizeFontFaceName } from "@/lib/fonts";
 
 type LoadedFont = {
   path: string;
@@ -79,10 +80,6 @@ const DEFAULT_TEMPLATE_HTML =
 // Keep content rendering consistent between on-screen, export, and print
 const CONTENT_CLASSES =
   "max-w-none focus:outline-none min-h-[50vh] [&_h1]:text-3xl [&_h2]:text-2xl [&_h3]:text-xl [&_p]:my-2 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:ml-6 [&_ol]:ml-6";
-
-const sanitizeFontFaceName = (str: string): string => {
-  return "Geez_" + str.replace(/[^a-zA-Z0-9_\-]/g, "_");
-};
 
 // Font size controls
 const MIN_FONT_SIZE = 8;

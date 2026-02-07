@@ -91,25 +91,30 @@ export default function AboutPage() {
             Pick a path and start in one click
           </span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 bg-red-300 ">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 ">
           {actions.map((action) => (
             <Link
               key={action.href}
               href={action.href}
-              className="group rounded-xl border border-[rgba(17,24,39,0.06)] bg-(--color-secondary) p-4 flex flex-col gap-2 hover:border-(--color-accent) hover:shadow-md transition-all"
+              className="group rounded-xl border border-[rgba(17,24,39,0.06)]
+              bg-(--color-secondary) p-4 flex flex-col gap-2
+              text-(--color-primary)
+              hover:bg-(--color-accent)
+              hover:text-white
+               hover:border-(--color-accent) hover:shadow-lg transition-all"
             >
               <div className="flex items-center justify-between gap-2">
-                <h3 className="text-base font-semibold text-(--color-primary)">
+                <h3 className="font-semibold ">
                   {action.title}
                 </h3>
                 <span className="text-xs px-2 py-1 rounded-full bg-white border border-[rgba(17,24,39,0.06)] text-(--color-primary-dark)">
                   Open
                 </span>
               </div>
-              <p className="text-sm text-(--color-text-muted) leading-relaxed">
+              <p className="text-sm leading-relaxed">
                 {action.detail}
               </p>
-              <span className="text-sm text-(--color-accent) font-semibold group-hover:translate-x-1 transition-transform">
+              <span className="text-sm font-semibold group-hover:translate-x-1 transition-transform">
                 Go →
               </span>
             </Link>

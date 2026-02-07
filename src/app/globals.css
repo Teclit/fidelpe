@@ -2,17 +2,16 @@
 
 :root {
     /* Primary colors */
-    --color-primary: #362925;
+  --color-primary: #855832;
     --color-primary-dark: #221714;
     --color-primary-one: #74482a;
-    --color-primary-two: #855832;
     --color-primary-three: #a17e61;
     --color-primary-light: #dbc9b8;
 
     /* Use the provided primary palette for all accents (no blue) */
     --color-secondary: #f7f4ef; /* clair et doux pour le fond général */
     --color-accent: var(--color-primary-one); /* #74482a */
-    --color-accent-cta: var(--color-primary-two); /* #855832 */
+    --color-accent-cta: var(--color-primary); /* #855832 */
 
     --color-info: #065f46; /* left as-is (green) if needed */
     --color-warning: #f59e0b;

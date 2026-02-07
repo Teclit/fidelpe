@@ -91,7 +91,7 @@ export default function AboutPage() {
             Pick a path and start in one click
           </span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 bg-red-300 ">
           {actions.map((action) => (
             <Link
               key={action.href}

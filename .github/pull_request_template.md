@@ -5,6 +5,13 @@ Please provide a clear and concise description of what this PR does and why.
 - Linked issue(s): Closes #
 - Type: Feature / Fix / Chore / Docs
 
+## Ownership / Reviewers
+
+CODEOWNERS will auto-request reviewers when configured.
+
+- Code owner(s) to review:
+- Areas touched:
+
 ## Checklist
 
 - [ ] I ran `yarn lint` locally and fixed all warnings/errors
@@ -12,6 +19,9 @@ Please provide a clear and concise description of what this PR does and why.
 - [ ] I built the project locally with `yarn build`
 - [ ] I added/updated docs where needed
 - [ ] I tested critical paths manually
+- [ ] Qodana check is green (if configured)
+- [ ] CI checks are green (lint/typecheck/build/Qodana)
+- [ ] Required code owner approvals are requested/received
 
 ## Screenshots / Demos (if UI)
 

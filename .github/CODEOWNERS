@@ -1,0 +1,5 @@
+# Default owners (replace with your GitHub username or team).
+* @teclit
+
+# Workflow ownership (CI/CD + quality gates).
+/.github/workflows/ @teclit

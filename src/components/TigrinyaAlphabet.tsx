@@ -2,18 +2,89 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { geezAlphabet, type GeezCharacter } from "@/data/geez";
+import { sanitizeFontFaceName } from "@/lib/fonts";
 
 type ViewMode = "carousel" | "grid";
+type FontOption = {
+  faceName: string;
+  label: string;
+  path: string;
+};
 
 const AUTO_ADVANCE_MS = 5000;
+const DEFAULT_FONT = "__default_ethiopic__";
+const DEFAULT_FONT_STACK = "'Noto Sans Ethiopic', 'Abyssinica SIL', serif";
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const isString = (value: unknown): value is string => typeof value === "string";
+
+const parseFontOptions = (payload: unknown): FontOption[] => {
+  if (!isRecord(payload) || !Array.isArray(payload.fonts)) return [];
+
+  const options: FontOption[] = [];
+  const seen = new Set<string>();
+
+  payload.fonts.forEach((entry) => {
+    if (!isRecord(entry)) return;
+
+    const path = isString(entry.path) ? entry.path : "";
+    if (!path) return;
+
+    const file = isString(entry.file)
+      ? entry.file
+      : (path.split("/").pop() ?? path);
+    const city = isString(entry.city) ? entry.city : "Font";
+    const displayName = file.replace(/\.(ttf|otf)$/i, "");
+    const faceName = sanitizeFontFaceName(displayName);
+
+    if (seen.has(faceName)) return;
+    seen.add(faceName);
+
+    options.push({
+      faceName,
+      label: `${city} - ${displayName}`,
+      path,
+    });
+  });
+
+  return options;
+};
 
 export default function TigrinyaAlphabet(): React.ReactElement {
   const alphabetRows = useMemo<GeezCharacter[]>(
     () => [...geezAlphabet].sort((a, b) => a.order - b.order),
-    []
+    [],
   );
   const [view, setView] = useState<ViewMode>("carousel");
   const [index, setIndex] = useState(0);
+  const [fontOptions, setFontOptions] = useState<FontOption[]>([]);
+  const [activeFont, setActiveFont] = useState<string>(DEFAULT_FONT);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadFonts = async () => {
+      try {
+        const response = await fetch("/fonts.min.json");
+        if (!response.ok) return;
+
+        const payload: unknown = await response.json();
+        if (!mounted) return;
+
+        const parsed = parseFontOptions(payload);
+        setFontOptions(parsed);
+      } catch {
+        setFontOptions([]);
+      }
+    };
+
+    loadFonts().catch(() => undefined);
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (view !== "carousel") return;
@@ -22,6 +93,36 @@ export default function TigrinyaAlphabet(): React.ReactElement {
     }, AUTO_ADVANCE_MS);
     return () => window.clearInterval(id);
   }, [view, alphabetRows.length]);
+
+  const selectedFont = useMemo(
+    () => fontOptions.find((font) => font.faceName === activeFont) ?? null,
+    [fontOptions, activeFont],
+  );
+
+  useEffect(() => {
+    if (!selectedFont) return;
+
+    const styleId = `alphabet-font-${selectedFont.faceName}`;
+    if (document.getElementById(styleId)) return;
+
+    const styleEl = document.createElement("style");
+    const format = selectedFont.path.toLowerCase().endsWith(".otf")
+      ? "opentype"
+      : "truetype";
+
+    styleEl.id = styleId;
+    styleEl.textContent = `@font-face { font-family: "${selectedFont.faceName}"; src: url('/${selectedFont.path}') format('${format}'); font-weight: 400; font-style: normal; font-display: swap; }`;
+    document.head.appendChild(styleEl);
+  }, [selectedFont]);
+
+  const geezFontStyle = useMemo(
+    () => ({
+      fontFamily: selectedFont
+        ? `'${selectedFont.faceName}', ${DEFAULT_FONT_STACK}`
+        : DEFAULT_FONT_STACK,
+    }),
+    [selectedFont],
+  );
 
   const current = alphabetRows[index];
 
@@ -38,7 +139,7 @@ export default function TigrinyaAlphabet(): React.ReactElement {
       .map((char, charIndex) => ({
         char,
         transliteration: row.latinTransliteration[charIndex],
-        charIndex
+        charIndex,
       }))
       .filter(({ char, transliteration }) => char && transliteration);
 
@@ -59,6 +160,7 @@ export default function TigrinyaAlphabet(): React.ReactElement {
               className={`${
                 large ? "text-3xl" : "text-2xl"
               } font-semibold text-(--color-primary) tigrinya-char ${large ? "large" : ""}`}
+              style={geezFontStyle}
             >
               {char}
             </span>
@@ -83,10 +185,12 @@ export default function TigrinyaAlphabet(): React.ReactElement {
             <p className="text-xs uppercase tracking-[0.2em] text-(--color-text-muted)">
               Geez / Tigrinya alphabet
             </p>
-            <h2 className="text-2xl sm:text-3xl font-bold text-(--color-primary)">{'Geez / Tigrinya alphabet'}</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-(--color-primary)">
+              {"Geez / Tigrinya alphabet"}
+            </h2>
             <p className="text-(--color-text-muted) text-sm sm:text-base">
-              Toggle between a slow carousel to focus on each phonetic group or a
-              full grid to scan and compare all rows at once.
+              Toggle between a slow carousel to focus on each phonetic group or
+              a full grid to scan and compare all rows at once.
             </p>
           </div>
           <div className="flex gap-2">
@@ -113,6 +217,28 @@ export default function TigrinyaAlphabet(): React.ReactElement {
               Grid view
             </button>
           </div>
+        </div>
+
+        <div className="flex items-center gap-2 sm:ml-auto">
+          <label
+            htmlFor="alphabet-font"
+            className="text-xs uppercase tracking-[0.15em] text-(--color-text-muted)"
+          >
+            Choose font
+          </label>
+          <select
+            id="alphabet-font"
+            value={activeFont}
+            onChange={(event) => setActiveFont(event.target.value)}
+            className="px-3 py-2 rounded-xl text-sm font-medium border border-[rgba(17,24,39,0.08)] bg-white text-(--color-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent)"
+          >
+            <option value={DEFAULT_FONT}>Geez Fonts</option>
+            {fontOptions.map((font) => (
+              <option key={font.faceName} value={font.faceName}>
+                {font.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         {view === "carousel" ? (
@@ -184,7 +310,9 @@ export default function TigrinyaAlphabet(): React.ReactElement {
           padding: 1rem;
           width: 100%;
           max-width: 100%;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          transition:
+            transform 0.3s ease,
+            box-shadow 0.3s ease;
         }
 
         .character-card:hover {
@@ -241,7 +369,8 @@ export default function TigrinyaAlphabet(): React.ReactElement {
             white 70%
           );
           transform: translateY(-5px) scale(1.05);
-          box-shadow: 0 8px 20px rgba(115, 85, 87, 0.8),
+          box-shadow:
+            0 8px 20px rgba(115, 85, 87, 0.8),
             0 4px 8px rgba(0, 0, 0, 0.2);
           border-top: 1px solid var(--primary-color, #735557);
           cursor: pointer;
@@ -272,7 +401,9 @@ export default function TigrinyaAlphabet(): React.ReactElement {
         .latin-char {
           font-size: 0.8rem;
           color: #6c757d;
-          transition: color 0.3s ease, font-weight 0.3s ease,
+          transition:
+            color 0.3s ease,
+            font-weight 0.3s ease,
             text-transform 0.3s ease;
         }
 

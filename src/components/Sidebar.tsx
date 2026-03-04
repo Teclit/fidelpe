@@ -23,11 +23,15 @@ export default function Sidebar(): React.ReactElement {
 
   const navItems: NavItem[] = [
     { href: "/", label: "Home", mobileLabel: "Home" },
-    { href: "/fonts-demo", label: "Geez Fonts", mobileLabel: "Geez Fonts" },
-    { href: "/geez", label: "Geez alphabet" },
+    {
+      href: "/fonts-demo",
+      label: "Font Library",
+      mobileLabel: "Font Library",
+    },
+    { href: "/geez", label: "Geez Alphabet" },
     { href: "/aetd", label: "AETD Dictionary" },
-    { href: "/extract", label: "Text Extractor" },
-    { href: "/acknowledgement", label: "Acknowledgement" },
+    { href: "/extract", label: "Text Processing" },
+    { href: "/acknowledgement", label: "Acknowledgments" },
     { href: "/about", label: "About" },
   ];
 
@@ -46,7 +50,7 @@ export default function Sidebar(): React.ReactElement {
       {/* Mobile: hamburger button */}
       <button
         type="button"
-        aria-label="Ouvrir le menu"
+        aria-label="Open navigation menu"
         onClick={toggleMobile}
         className="md:hidden fixed top-2 left-0 z-40 inline-flex items-center justify-center h-10 w-10 rounded-md bg-transparent text-(--color-text-dark)
         border border-gray-200 shadow-sm  hover:bg-white focus:outline-none focus:ring-2 focus:ring-(--color-accent)"
@@ -75,7 +79,7 @@ export default function Sidebar(): React.ReactElement {
               </h2>
               <button
                 type="button"
-                aria-label="Fermer le menu"
+                aria-label="Close navigation menu"
                 onClick={closeMobile}
                 className="inline-flex items-center justify-center h-9 w-9 rounded-md border border-gray-200 text-(--color-text-dark) hover:bg-gray-50"
               >
@@ -111,7 +115,7 @@ export default function Sidebar(): React.ReactElement {
 
       <button
         type="button"
-        aria-label="Deployer la barre laterale"
+        aria-label="Expand sidebar"
         aria-controls="desktop-sidebar"
         aria-expanded={desktopOpen}
         onClick={toggleDesktop}
@@ -137,7 +141,7 @@ export default function Sidebar(): React.ReactElement {
               </h2>
               <button
                 type="button"
-                aria-label="Reduire la barre laterale"
+                aria-label="Collapse sidebar"
                 aria-controls="desktop-sidebar"
                 aria-expanded={desktopOpen}
                 onClick={toggleDesktop}
@@ -169,16 +173,7 @@ export default function Sidebar(): React.ReactElement {
               <p className="mb-2">
                 {"\u00A9"} FidelPE Asmara 2023 - {new Date().getFullYear()}.
               </p>
-              <p className="flex items-center justify-center gap-1 text-gray-400">
-                Made with
-                <svg
-                  className="w-3.5 h-3.5 text-red-500 fill-current"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                </svg>
-                and code
-              </p>
+              <p className="text-gray-400">Built by the FidelPE team.</p>
             </div>
           </>
         )}

@@ -183,14 +183,14 @@ export default function TigrinyaAlphabet(): React.ReactElement {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-(--color-text-muted)">
-              Geez / Tigrinya alphabet
+              Alphabet Reference
             </p>
             <h2 className="text-2xl sm:text-3xl font-bold text-(--color-primary)">
-              {"Geez / Tigrinya alphabet"}
+              Geez and Tigrinya Alphabet Explorer
             </h2>
             <p className="text-(--color-text-muted) text-sm sm:text-base">
-              Toggle between a slow carousel to focus on each phonetic group or
-              a full grid to scan and compare all rows at once.
+              Use carousel mode for focused review of each phonetic group, or
+              switch to grid mode for full side-by-side comparison.
             </p>
           </div>
           <div className="flex gap-2">
@@ -203,7 +203,7 @@ export default function TigrinyaAlphabet(): React.ReactElement {
                   : "bg-white text-(--color-primary) border-[rgba(17,24,39,0.06)] hover:bg-(--color-secondary)"
               }`}
             >
-              Carousel view
+              Carousel Mode
             </button>
             <button
               type="button"
@@ -214,7 +214,7 @@ export default function TigrinyaAlphabet(): React.ReactElement {
                   : "bg-white text-(--color-primary) border-[rgba(17,24,39,0.06)] hover:bg-(--color-secondary)"
               }`}
             >
-              Grid view
+              Grid Mode
             </button>
           </div>
         </div>
@@ -224,7 +224,7 @@ export default function TigrinyaAlphabet(): React.ReactElement {
             htmlFor="alphabet-font"
             className="text-xs uppercase tracking-[0.15em] text-(--color-text-muted)"
           >
-            Choose font
+            Font Selection
           </label>
           <select
             id="alphabet-font"
@@ -232,7 +232,7 @@ export default function TigrinyaAlphabet(): React.ReactElement {
             onChange={(event) => setActiveFont(event.target.value)}
             className="px-3 py-2 rounded-xl text-sm font-medium border border-[rgba(17,24,39,0.08)] bg-white text-(--color-primary) focus:outline-none focus:ring-2 focus:ring-(--color-accent)"
           >
-            <option value={DEFAULT_FONT}>Geez Fonts</option>
+            <option value={DEFAULT_FONT}>Default Font Set</option>
             {fontOptions.map((font) => (
               <option key={font.faceName} value={font.faceName}>
                 {font.label}
@@ -286,7 +286,7 @@ export default function TigrinyaAlphabet(): React.ReactElement {
                 <header className="character-group flex items-center justify-between gap-2">
                   <div>
                     <p className="text-xs uppercase tracking-[0.15em] text-(--color-text-muted)">
-                      Group
+                      Phonetic Group
                     </p>
                     <h3 className="text-lg font-semibold text-(--color-primary) capitalize">
                       {row.phoneticGroup.replace(/-/g, " ")}

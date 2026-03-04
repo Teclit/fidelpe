@@ -66,6 +66,9 @@ const parseCityMap = (payload: unknown): CityMap | null => {
   return cityMap;
 };
 
+const DEFAULT_PREVIEW_TEXT =
+  "\u1230\u120B\u121D \u1265\u133E\u1275! \u1265\u1229\u12AD \u1218\u12D3\u120D\u1272";
+
 /**
  * Geez Fonts Demonstration Component
  * Displays fonts organized by city with live preview and controls
@@ -75,7 +78,7 @@ export default function FontsDemo() {
   const [cityMap, setCityMap] = useState<CityMap>({});
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [selectedFont, setSelectedFont] = useState<string>("");
-  const [previewText, setPreviewText] = useState<string>("ሰላም ብጾት! ብሩክ መዓልቲ");
+  const [previewText, setPreviewText] = useState<string>(DEFAULT_PREVIEW_TEXT);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>(
@@ -83,7 +86,7 @@ export default function FontsDemo() {
       quick: true,
       controls: false,
       grid: false,
-    }
+    },
   );
 
   // Load fonts configuration
@@ -147,9 +150,9 @@ export default function FontsDemo() {
           sanitizeFontFaceName(
             (fontsList[0].file || fontsList[0].path || "").replace(
               /\.ttf$/i,
-              ""
-            )
-          )
+              "",
+            ),
+          ),
         );
 
         setLoading(false);
@@ -184,7 +187,7 @@ export default function FontsDemo() {
     const rules = fonts
       .map((f) => {
         const faceName = sanitizeFontFaceName(
-          (f.file || f.path || "").replace(/\.ttf$/i, "")
+          (f.file || f.path || "").replace(/\.ttf$/i, ""),
         );
         return `@font-face { font-family: "${faceName}"; src: url('/${f.path}') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }`;
       })
@@ -231,7 +234,7 @@ export default function FontsDemo() {
         <div className="flex items-center justify-center min-h-100">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-gray-900 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading fonts...</p>
+            <p className="text-gray-600">Loading font library...</p>
           </div>
         </div>
       </div>
@@ -244,14 +247,14 @@ export default function FontsDemo() {
       <div className="p-8 max-w-7xl mx-auto">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6">
           <h2 className="text-red-800 font-semibold mb-2">
-            Error Loading Fonts
+            Unable to Load Font Library
           </h2>
           <p className="text-red-600">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
           >
-            Retry
+            Reload
           </button>
         </div>
       </div>
@@ -263,9 +266,12 @@ export default function FontsDemo() {
     return (
       <div className="p-8 max-w-7xl mx-auto">
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-          <h2 className="text-yellow-800 font-semibold mb-2">No Fonts Found</h2>
+          <h2 className="text-yellow-800 font-semibold mb-2">
+            No Fonts Available
+          </h2>
           <p className="text-yellow-600">
-            No fonts were loaded from fonts.min.json. Please check the file.
+            No fonts were found in fonts.min.json. Please verify the file
+            contents.
           </p>
         </div>
       </div>
@@ -276,30 +282,39 @@ export default function FontsDemo() {
     <div className="p-8 max-w-7xl mx-auto">
       <div className="mb-8 text-center">
         <h1 className="text-4xl font-bold mb-3 text-gray-900">
-          Geez Fonts for Your Projects
+          Geez Font Library
         </h1>
         <p className="text-gray-600">
-          Try, preview, and download {fonts.length} fonts for
+          Evaluate, preview, and download{" "}
+          <span className="font-bold text-2xl text-gray-900 text-italic">
+            {" "}
+            {fonts.length}
+          </span>{" "}
+          fonts for
+          <span className="text-[#43B02A] text-2xl font-bold italic">
+            {" "}
+            Blin ,
+          </span>
           <span className="text-[#418FDE] text-2xl font-bold italic">
             {" "}
             Geez,
-          </span>
-          <span className="text-[#FFC72C] text-2xl font-bold italic">
-            {" "}
-            Tigre,
           </span>
           <span className="text-[#E4002B] text-2xl font-bold italic">
             {" "}
             Tigrinya,
           </span>
+          <span className="text-[#FFC72C] text-2xl font-bold italic">
+            {" "}
+            Tigre,
+          </span>
           and
-          <span className="text-[#43B02A] text-2xl font-bold italic">
+          <span className="text-[#128d12] text-2xl font-bold italic">
             {" "}
             Amharic{" "}
           </span>
-          languages from {cities.length} different{" "}
-          <span className="font-bold">Fonts Group</span>. All fonts here are
-          free to try and download for non-profit use.
+          scripts across{" "}
+          <span className="font-bold">{cities.length} font groups</span> . All
+          listed fonts are available for evaluation and non-profit use.
         </p>
       </div>
 
@@ -332,7 +347,7 @@ export default function FontsDemo() {
               />
             </svg>
             <span className="text-lg font-semibold text-gray-900">
-              Quick preview by sample
+              Quick Preview
             </span>
           </div>
         </summary>
@@ -347,8 +362,8 @@ export default function FontsDemo() {
                 const faceName = sanitizeFontFaceName(
                   (firstFont.file || firstFont.path || "").replace(
                     /\.ttf$/i,
-                    ""
-                  )
+                    "",
+                  ),
                 );
 
                 return (
@@ -407,7 +422,7 @@ export default function FontsDemo() {
               />
             </svg>
             <span className="text-lg font-semibold text-gray-900">
-              Choose your font & preview text
+              Font and Preview Controls
             </span>
           </div>
         </summary>
@@ -420,7 +435,7 @@ export default function FontsDemo() {
                   htmlFor="citySelect"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Font Group:
+                  Font Group
                 </label>
                 <select
                   id="citySelect"
@@ -435,8 +450,8 @@ export default function FontsDemo() {
                             newCityFonts[0].file ||
                             newCityFonts[0].path ||
                             ""
-                          ).replace(/\.ttf$/i, "")
-                        )
+                          ).replace(/\.ttf$/i, ""),
+                        ),
                       );
                     }
                   }}
@@ -455,7 +470,7 @@ export default function FontsDemo() {
                   htmlFor="fontSelect"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Font:
+                  Font Family
                 </label>
                 <select
                   id="fontSelect"
@@ -465,7 +480,7 @@ export default function FontsDemo() {
                 >
                   {cityFonts.map((f) => {
                     const faceName = sanitizeFontFaceName(
-                      (f.file || f.path || "").replace(/\.ttf$/i, "")
+                      (f.file || f.path || "").replace(/\.ttf$/i, ""),
                     );
                     return (
                       <option key={faceName} value={faceName}>
@@ -481,14 +496,14 @@ export default function FontsDemo() {
                   htmlFor="textInput"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Text:
+                  Preview Text
                 </label>
                 <input
                   id="textInput"
                   type="text"
                   value={previewText}
                   onChange={(e) =>
-                    setPreviewText(e.target.value || "ሰላም ብጾት! ብሩክ መዓልቲ")
+                    setPreviewText(e.target.value || DEFAULT_PREVIEW_TEXT)
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
@@ -534,7 +549,7 @@ export default function FontsDemo() {
               />
             </svg>
             <span className="text-lg font-semibold text-gray-900">
-              Browse and Download Font Collections
+              Font Catalog and Downloads
             </span>
           </div>
           {selectedCity && (
@@ -547,13 +562,13 @@ export default function FontsDemo() {
         {openAccordions.grid && (
           <div className="p-4 pt-0 border-t border-gray-100">
             <div className="mb-4 text-lg font-semibold text-gray-700">
-              Font Group: {getCityLabel(selectedCity)} ({selectedCity})
+              Selected Font Group: {getCityLabel(selectedCity)} ({selectedCity})
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {cityFonts.map((f) => {
                 const faceName = sanitizeFontFaceName(
-                  (f.file || f.path || "").replace(/\.ttf$/i, "")
+                  (f.file || f.path || "").replace(/\.ttf$/i, ""),
                 );
 
                 return (
@@ -573,11 +588,11 @@ export default function FontsDemo() {
                         download={f.file}
                         className="text-xs text-blue-600 hover:text-blue-800 underline shrink-0"
                       >
-                        Download
+                        Download File
                       </a>
                     </div>
                     <div className="text-[11px] text-gray-500 mb-2">
-                      Free for non-profit use; preview live before you download.
+                      Available for non-profit use. Preview before downloading.
                     </div>
                     <div
                       className="text-xl text-gray-900 wrap-break-word"
@@ -602,7 +617,7 @@ export default function FontsDemo() {
           rel="noopener noreferrer"
           className="text-gray-700 hover:text-blue-800 underline"
         >
-          How to use these fonts (PDF)
+          Font Usage Guide (PDF)
         </a>
       </footer>
     </div>

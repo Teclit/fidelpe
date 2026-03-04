@@ -153,7 +153,7 @@ const arrayBufferToBase64 = (buf: ArrayBuffer): string => {
 
 // Legacy default template we used previously; treat it as empty to avoid exporting it
 const DEFAULT_TEMPLATE_HTML =
-  "<h2>Welcome</h2><p>Start typing your document here…</p>";
+  "<h2>Welcome</h2><p>Start typing your document here...</p>";
 
 // Keep content rendering consistent between on-screen, export, and print
 const CONTENT_CLASSES =
@@ -268,7 +268,9 @@ export default function RichTextEditor(): React.ReactElement {
       } catch (e) {
         console.error("Save failed", e);
         if (!opts?.silent) {
-          alert("Save failed. Check storage permissions and retry.");
+          alert(
+            "Unable to save changes. Check browser storage permissions and try again."
+          );
         }
       }
     },
@@ -387,7 +389,9 @@ export default function RichTextEditor(): React.ReactElement {
         protocols: ["http", "https", "mailto"],
       }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
-      Placeholder.configure({ placeholder: "Type here…" }),
+      Placeholder.configure({
+        placeholder: "Start writing your document...",
+      }),
       StarterKit.configure({
         bulletList: { keepMarks: true },
         orderedList: { keepMarks: true },
@@ -547,7 +551,7 @@ export default function RichTextEditor(): React.ReactElement {
   const printSaved = async () => {
     const html = getHtmlForExport();
     if (!hasVisibleContent(html)) {
-      alert("Nothing to print.");
+      alert("No content is available for printing.");
       return;
     }
     // Build/attach a print target container
@@ -652,14 +656,14 @@ export default function RichTextEditor(): React.ReactElement {
             onClick={() => editor?.chain().focus().undo().run()}
             disabled={!editor?.can().undo?.()}
           >
-            ↶
+            Undo
           </ToolbarButton>
           <ToolbarButton
             title="Redo"
             onClick={() => editor?.chain().focus().redo().run()}
             disabled={!editor?.can().redo?.()}
           >
-            ↷
+            Redo
           </ToolbarButton>
 
           <div className="w-px h-6 bg-gray-200 mx-2" />
@@ -742,7 +746,7 @@ export default function RichTextEditor(): React.ReactElement {
             active={!!editor?.isActive("bulletList")}
             onClick={() => editor?.chain().focus().toggleBulletList().run()}
           >
-            • List
+            Bullet List
           </ToolbarButton>
           <ToolbarButton
             title="Ordered List"
@@ -759,21 +763,21 @@ export default function RichTextEditor(): React.ReactElement {
             active={!!editor?.isActive({ textAlign: "left" })}
             onClick={() => editor?.chain().focus().setTextAlign("left").run()}
           >
-            ⟸
+            L
           </ToolbarButton>
           <ToolbarButton
             title="Align Center"
             active={!!editor?.isActive({ textAlign: "center" })}
             onClick={() => editor?.chain().focus().setTextAlign("center").run()}
           >
-            ≡
+            C
           </ToolbarButton>
           <ToolbarButton
             title="Align Right"
             active={!!editor?.isActive({ textAlign: "right" })}
             onClick={() => editor?.chain().focus().setTextAlign("right").run()}
           >
-            ⟹
+            R
           </ToolbarButton>
           <ToolbarButton
             title="Justify"
@@ -782,12 +786,12 @@ export default function RichTextEditor(): React.ReactElement {
               editor?.chain().focus().setTextAlign("justify").run()
             }
           >
-            ≣
+            J
           </ToolbarButton>
 
           <div className="w-px h-6 bg-gray-200 mx-2" />
 
-          <label className="text-xs mr-2">Font</label>
+          <label className="text-xs mr-2">Font Family</label>
           <select
             className="mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm w-56"
             value={perso.fontFamily}
@@ -797,7 +801,7 @@ export default function RichTextEditor(): React.ReactElement {
             disabled={fontsLoading || !fonts.length}
           >
             <option value="" disabled>
-              {fontsLoading ? "Loading fonts..." : "Select a font"}
+              {fontsLoading ? "Loading font library..." : "Select a font family"}
             </option>
             {fontsByCity.map(([city, group]) => (
               <optgroup key={city} label={city}>
@@ -814,7 +818,7 @@ export default function RichTextEditor(): React.ReactElement {
               className="text-xs text-red-600 mr-2"
               title={fontsError || undefined}
             >
-              Fonts unavailable
+              Font library unavailable
             </span>
           )}
 
@@ -884,7 +888,7 @@ export default function RichTextEditor(): React.ReactElement {
             aria-label="Font size presets"
           >
             <option value="" disabled>
-              Preset
+              Presets
             </option>
             {SIZE_PRESETS.map((s) => (
               <option key={s} value={String(s)}>
@@ -893,7 +897,7 @@ export default function RichTextEditor(): React.ReactElement {
             ))}
           </select>
 
-          <label className="text-xs mr-2">Line</label>
+          <label className="text-xs mr-2">Line Height</label>
           <input
             type="number"
             min={MIN_LINE}
@@ -922,7 +926,7 @@ export default function RichTextEditor(): React.ReactElement {
             }
             title="Decrease line height"
           >
-            −
+            -
           </button>
           <button
             type="button"
@@ -969,7 +973,7 @@ export default function RichTextEditor(): React.ReactElement {
             aria-label="Line height presets"
           >
             <option value="" disabled>
-              Preset
+              Presets
             </option>
             {LINE_PRESETS.map((lh) => (
               <option key={lh} value={String(lh)}>
@@ -978,7 +982,7 @@ export default function RichTextEditor(): React.ReactElement {
             ))}
           </select>
 
-          <label className="text-xs mr-2">Width</label>
+          <label className="text-xs mr-2">Page Width</label>
           <select
             className="mr-2 mb-1 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm"
             value={perso.pageWidth}
@@ -1004,7 +1008,7 @@ export default function RichTextEditor(): React.ReactElement {
             </button>
             {savedAt && (
               <span className="text-xs text-(--color-text-muted) mr-2">
-                Saved ✓
+                Saved
               </span>
             )}
             <button
@@ -1027,7 +1031,9 @@ export default function RichTextEditor(): React.ReactElement {
                 }))
               }
             >
-              {perso.theme === "light" ? "Dark" : "Light"} Theme
+              {perso.theme === "light"
+                ? "Switch to Dark Theme"
+                : "Switch to Light Theme"}
             </button>
           </div>
         </div>

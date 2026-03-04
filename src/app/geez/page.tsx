@@ -14,11 +14,11 @@ export default function GeezPage(): React.ReactElement {
           </h1>
           <p className="text-(--color-text-muted) text-sm sm:text-base leading-relaxed">
             Adapted for quick toggling between slow practice and fast reference.
-            Works on mobile, uses Ethiopic fonts when available, and keeps
+            Works on mobile, uses Geez fonts when available, and keeps
             transliterations beside every symbol.
           </p>
           <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-(--color-secondary) border border-(--card-border)">
-            <span className="text-(--color-primary)">ፊደል፣ ትግርኛ</span>
+            <span className="text-(--color-primary)">ፊደላት ፣ ትግርኛ</span>
           </div>
         </div>
       </section>

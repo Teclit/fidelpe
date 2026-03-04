@@ -1,5 +1,4 @@
-import TigrinyaAlphabet from "@/components/TigrinyaAlphabet";
-
+﻿import TigrinyaAlphabet from "@/components/TigrinyaAlphabet";
 
 export default function GeezPage(): React.ReactElement {
   return (
@@ -7,18 +6,21 @@ export default function GeezPage(): React.ReactElement {
       <section className="rounded-2xl border border-[rgba(17,24,39,0.08)] bg-white shadow-sm p-6 sm:p-7">
         <div className="flex flex-col gap-3">
           <p className="text-xs uppercase tracking-[0.2em] text-(--color-text-muted)">
-            Alphabet
+            Typography Guidance
           </p>
           <h1 className="text-3xl sm:text-4xl font-bold text-(--color-primary)">
-            Geez / Tigrinya alphabet explorer
+            Geez and Tigrinya Script Reference
           </h1>
           <p className="text-(--color-text-muted) text-sm sm:text-base leading-relaxed">
-            Adapted for quick toggling between slow practice and fast reference.
-            Works on mobile, uses Geez fonts when available, and keeps
-            transliterations beside every symbol.
+            Use this page to review Geez and Tigrinya characters, evaluate font
+            behavior, and train teams on consistent script usage. Switch between
+            carousel and grid views to support document preparation, quality
+            checks, and professional publishing workflows.
           </p>
           <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-(--color-secondary) border border-(--card-border)">
-            <span className="text-(--color-primary)">ፊደላት ፣ ትግርኛ</span>
+            <span className="text-(--color-primary)">
+              Font Evaluation and Script Training
+            </span>
           </div>
         </div>
       </section>

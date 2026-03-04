@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { sanitizeFontFaceName } from "@/lib/fonts";
+import Image from "next/image";
 
 interface Font {
   path: string;
@@ -105,7 +106,7 @@ export default function FontsDemo() {
 
         if (!fontsRes.ok) {
           if (active) {
-            setError(`Failed to fetch fonts.min.json: ${fontsRes.status}`);
+            setError("We could not load the font library right now.");
             setLoading(false);
           }
           return;
@@ -113,7 +114,7 @@ export default function FontsDemo() {
 
         if (!cityRes.ok) {
           if (active) {
-            setError(`Failed to fetch city_name.json: ${cityRes.status}`);
+            setError("We could not load the font library right now.");
             setLoading(false);
           }
           return;
@@ -126,7 +127,7 @@ export default function FontsDemo() {
 
         const fontsList = parseFontsPayload(fontsData);
         if (!fontsList) {
-          setError("Fonts payload is invalid");
+          setError("The font data format is not valid.");
           setLoading(false);
           return;
         }
@@ -135,7 +136,7 @@ export default function FontsDemo() {
         console.log(`Loaded ${fontsList.length} fonts from fonts.min.json`);
 
         if (fontsList.length === 0) {
-          setError("No fonts found in fonts.min.json");
+          setError("No fonts are currently available.");
           setLoading(false);
           return;
         }
@@ -159,8 +160,9 @@ export default function FontsDemo() {
       } catch (err) {
         if (!active) return;
         console.error("Failed to load fonts:", err);
-        const message = err instanceof Error ? err.message : "Unknown error";
-        setError(`Error loading fonts: ${message}`);
+        setError(
+          "An unexpected issue occurred while loading fonts. Please refresh and try again.",
+        );
         setLoading(false);
       }
     };
@@ -234,7 +236,7 @@ export default function FontsDemo() {
         <div className="flex items-center justify-center min-h-100">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-gray-900 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading font library...</p>
+            <p className="text-gray-600">Preparing the font library...</p>
           </div>
         </div>
       </div>
@@ -247,14 +249,14 @@ export default function FontsDemo() {
       <div className="p-8 max-w-7xl mx-auto">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6">
           <h2 className="text-red-800 font-semibold mb-2">
-            Unable to Load Font Library
+            We Could Not Load the Font Library
           </h2>
           <p className="text-red-600">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
           >
-            Reload
+            Try Again
           </button>
         </div>
       </div>
@@ -270,8 +272,7 @@ export default function FontsDemo() {
             No Fonts Available
           </h2>
           <p className="text-yellow-600">
-            No fonts were found in fonts.min.json. Please verify the file
-            contents.
+            No fonts are available at the moment. Please check back later.
           </p>
         </div>
       </div>
@@ -282,10 +283,10 @@ export default function FontsDemo() {
     <div className="p-8 max-w-7xl mx-auto">
       <div className="mb-8 text-center">
         <h1 className="text-4xl font-bold mb-3 text-gray-900">
-          Geez Font Library
+          Business Font Library
         </h1>
         <p className="text-gray-600">
-          Evaluate, preview, and download{" "}
+          Review, compare, and download{" "}
           <span className="font-bold text-2xl text-gray-900 text-italic">
             {" "}
             {fonts.length}
@@ -293,7 +294,7 @@ export default function FontsDemo() {
           fonts for
           <span className="text-[#43B02A] text-2xl font-bold italic">
             {" "}
-            Blin ,
+            Blin,
           </span>
           <span className="text-[#418FDE] text-2xl font-bold italic">
             {" "}
@@ -313,8 +314,9 @@ export default function FontsDemo() {
             Amharic{" "}
           </span>
           scripts across{" "}
-          <span className="font-bold">{cities.length} font groups</span> . All
-          listed fonts are available for evaluation and non-profit use.
+          <span className="font-bold">{cities.length} font collections</span>.
+          Use this page to select the most suitable style for business
+          documents, training materials, and presentations.
         </p>
       </div>
 
@@ -347,13 +349,39 @@ export default function FontsDemo() {
               />
             </svg>
             <span className="text-lg font-semibold text-gray-900">
-              Quick Preview
+              Quick Style Preview
             </span>
           </div>
         </summary>
 
         {openAccordions.quick && (
-          <div className="p-4 pt-0 border-t border-gray-100">
+          <div className="p-4 pt-0 border-t border-(--card-border)">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <figure className=" border  border-(--card-border) bg-white shadow-sm overflow-hidden">
+                <Image
+                  src="/samples/sample_font.png"
+                  alt="Word toolbar showing Geez font selection."
+                  width={283}
+                  height={227}
+                  className="w-full h-52 object-cover bg-gray-50"
+                />
+                <figcaption className="px-3 py-2 text-xs text-gray-600">
+                  Font selection example
+                </figcaption>
+              </figure>
+              <figure className=" border  border-(--card-border) bg-white shadow-sm overflow-hidden">
+                <Image
+                  src="/samples/sample_text.png"
+                  alt="Sample document preview using multiple Geez font styles."
+                  width={954}
+                  height={491}
+                  className="w-full h-52 object-cover bg-gray-50"
+                />
+                <figcaption className="px-3 py-2 text-xs text-gray-600">
+                  Multi-style text preview
+                </figcaption>
+              </figure>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {cities.slice(0, 6).map((city) => {
                 const cityFontsPreview = fontsByCity.get(city) || [];
@@ -422,7 +450,7 @@ export default function FontsDemo() {
               />
             </svg>
             <span className="text-lg font-semibold text-gray-900">
-              Font and Preview Controls
+              Select Font and Sample Text
             </span>
           </div>
         </summary>
@@ -435,7 +463,7 @@ export default function FontsDemo() {
                   htmlFor="citySelect"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Font Group
+                  Font Collection
                 </label>
                 <select
                   id="citySelect"
@@ -496,7 +524,7 @@ export default function FontsDemo() {
                   htmlFor="textInput"
                   className="block text-sm font-medium text-gray-700 mb-1"
                 >
-                  Preview Text
+                  Sample Text
                 </label>
                 <input
                   id="textInput"
@@ -549,7 +577,7 @@ export default function FontsDemo() {
               />
             </svg>
             <span className="text-lg font-semibold text-gray-900">
-              Font Catalog and Downloads
+              Browse and Download Fonts
             </span>
           </div>
           {selectedCity && (
@@ -562,7 +590,8 @@ export default function FontsDemo() {
         {openAccordions.grid && (
           <div className="p-4 pt-0 border-t border-gray-100">
             <div className="mb-4 text-lg font-semibold text-gray-700">
-              Selected Font Group: {getCityLabel(selectedCity)} ({selectedCity})
+              Current Font Collection: {getCityLabel(selectedCity)} (
+              {selectedCity})
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -588,11 +617,12 @@ export default function FontsDemo() {
                         download={f.file}
                         className="text-xs text-blue-600 hover:text-blue-800 underline shrink-0"
                       >
-                        Download File
+                        Download
                       </a>
                     </div>
                     <div className="text-[11px] text-gray-500 mb-2">
-                      Available for non-profit use. Preview before downloading.
+                      This font is available for non-profit use. Preview before
+                      download.
                     </div>
                     <div
                       className="text-xl text-gray-900 wrap-break-word"
@@ -617,7 +647,7 @@ export default function FontsDemo() {
           rel="noopener noreferrer"
           className="text-gray-700 hover:text-blue-800 underline"
         >
-          Font Usage Guide (PDF)
+          Download Font Usage Guide (PDF)
         </a>
       </footer>
     </div>

@@ -4,7 +4,7 @@ import { tsoronaAsmara } from "@/lib/fonts";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useCallback, useState } from "react";
-import { FiMenu, FiX } from "react-icons/fi";
+import { FiChevronLeft, FiMenu, FiX } from "react-icons/fi";
 
 type NavItem = {
   href: string;
@@ -13,10 +13,13 @@ type NavItem = {
 };
 
 export default function Sidebar(): React.ReactElement {
-  const [open, setOpen] = useState(false);
-  const close = useCallback(() => setOpen(false), []);
-  const toggle = useCallback(() => setOpen((v) => !v), []);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [desktopOpen, setDesktopOpen] = useState(true);
   const pathname = usePathname();
+
+  const closeMobile = useCallback(() => setMobileOpen(false), []);
+  const toggleMobile = useCallback(() => setMobileOpen((v) => !v), []);
+  const toggleDesktop = useCallback(() => setDesktopOpen((v) => !v), []);
 
   const navItems: NavItem[] = [
     { href: "/", label: "Home", mobileLabel: "Home" },
@@ -36,6 +39,7 @@ export default function Sidebar(): React.ReactElement {
 
   const navLinkBase =
     "block rounded-md px-3 py-2 text-sm transition-colors duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-(--color-accent)/30";
+  const appTitle = "\u134A\u12F0\u120D\u1350 \u121D\u1235 \u130D\u12A5\u12DD";
 
   return (
     <>
@@ -43,7 +47,7 @@ export default function Sidebar(): React.ReactElement {
       <button
         type="button"
         aria-label="Ouvrir le menu"
-        onClick={toggle}
+        onClick={toggleMobile}
         className="md:hidden fixed top-2 left-0 z-40 inline-flex items-center justify-center h-10 w-10 rounded-md bg-transparent text-(--color-text-dark)
         border border-gray-200 shadow-sm  hover:bg-white focus:outline-none focus:ring-2 focus:ring-(--color-accent)"
       >
@@ -51,12 +55,12 @@ export default function Sidebar(): React.ReactElement {
       </button>
 
       {/* Mobile: overlay drawer */}
-      {open && (
+      {mobileOpen && (
         <div
           className="md:hidden fixed inset-0 z-40"
           role="dialog"
           aria-modal="true"
-          onClick={close}
+          onClick={closeMobile}
         >
           <div className="absolute inset-0 bg-black/40" />
           <div
@@ -67,12 +71,12 @@ export default function Sidebar(): React.ReactElement {
               <h2
                 className={`${tsoronaAsmara.className} font-bold text-(--color-primary)`}
               >
-                ፊደልፐ ምስ ግእዝ
+                {appTitle}
               </h2>
               <button
                 type="button"
                 aria-label="Fermer le menu"
-                onClick={close}
+                onClick={closeMobile}
                 className="inline-flex items-center justify-center h-9 w-9 rounded-md border border-gray-200 text-(--color-text-dark) hover:bg-gray-50"
               >
                 <FiX size={18} />
@@ -91,7 +95,7 @@ export default function Sidebar(): React.ReactElement {
                         ? "bg-(--color-accent) text-white shadow-sm hover:bg-(--color-accent)"
                         : "text-(--color-text-dark) hover:bg-(--color-secondary)"
                     }`}
-                    onClick={close}
+                    onClick={closeMobile}
                   >
                     {mobileLabel ?? label}
                   </Link>
@@ -99,55 +103,85 @@ export default function Sidebar(): React.ReactElement {
               })}
             </nav>
             <div className="mt-auto w-full text-center border-t border-gray-200 pt-4 text-xs text-(--color-text-muted)">
-              © {new Date().getFullYear()}
+              {"\u00A9"} {new Date().getFullYear()}
             </div>
           </div>
         </div>
       )}
 
-      {/* Desktop: persistent sidebar */}
-      <aside className="hidden md:flex md:basis-[20%] shrink-0 bg-white/80 border-r border-gray-200/70 sticky top-0 h-screen p-4 text-(--color-text-dark) flex-col justify-start items-stretch">
-        <div className="mb-4">
-          <h2
-            className={`${tsoronaAsmara.className} text-3xl font-bold text-(--color-primary)`}
-          >
-            ፊደልፐ ምስ ግእዝ
-          </h2>
-        </div>
-        <nav className="space-y-4 w-full mb-4">
-          {navItems.map(({ href, label }) => {
-            const active = isActive(href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                aria-current={active ? "page" : undefined}
-                className={`${navLinkBase} ${
-                  active
-                    ? "bg-(--color-accent) text-white shadow-sm hover:bg-(--color-accent)"
-                    : "text-(--color-text-dark) hover:bg-(--color-secondary)"
-                }`}
+      <button
+        type="button"
+        aria-label="Deployer la barre laterale"
+        aria-controls="desktop-sidebar"
+        aria-expanded={desktopOpen}
+        onClick={toggleDesktop}
+        className={`${desktopOpen ? "hidden" : "hidden md:inline-flex"} fixed top-3 left-3 z-30 items-center justify-center h-10 w-10 rounded-md bg-white text-(--color-text-dark) border border-gray-200 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-(--color-accent)`}
+      >
+        <FiMenu size={20} />
+      </button>
+
+      {/* Desktop: collapsible sidebar */}
+      <aside
+        id="desktop-sidebar"
+        className={`hidden md:flex shrink-0 bg-white/80 border-r border-gray-200/70 sticky top-0 h-screen text-(--color-text-dark) flex-col justify-start items-stretch transition-all duration-300 ease-out ${
+          desktopOpen ? "w-[20rem] p-4" : "w-0 p-0 border-r-0 overflow-hidden"
+        }`}
+      >
+        {desktopOpen && (
+          <>
+            <div className="mb-4 flex items-start justify-between gap-2">
+              <h2
+                className={`${tsoronaAsmara.className} text-3xl font-bold text-(--color-primary)`}
               >
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="mt-auto w-full text-center border-t border-gray-200/70 pt-4 text-xs text-(--color-text-muted)">
-          <p className="mb-2">
-            © FidelPE Asmara 2023 - {new Date().getFullYear()}.
-          </p>
-          <p className="flex items-center justify-center gap-1 text-gray-400">
-            Made with
-            <svg
-              className="w-3.5 h-3.5 text-red-500 fill-current"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
-            and code
-          </p>
-        </div>
+                {appTitle}
+              </h2>
+              <button
+                type="button"
+                aria-label="Reduire la barre laterale"
+                aria-controls="desktop-sidebar"
+                aria-expanded={desktopOpen}
+                onClick={toggleDesktop}
+                className="inline-flex items-center justify-center h-9 w-9 rounded-md border border-gray-200 text-(--color-text-dark) hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-(--color-accent)"
+              >
+                <FiChevronLeft size={18} />
+              </button>
+            </div>
+            <nav className="space-y-4 w-full mb-4">
+              {navItems.map(({ href, label }) => {
+                const active = isActive(href);
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    aria-current={active ? "page" : undefined}
+                    className={`${navLinkBase} ${
+                      active
+                        ? "bg-(--color-accent) text-white shadow-sm hover:bg-(--color-accent)"
+                        : "text-(--color-text-dark) hover:bg-(--color-secondary)"
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+            </nav>
+            <div className="mt-auto w-full text-center border-t border-gray-200/70 pt-4 text-xs text-(--color-text-muted)">
+              <p className="mb-2">
+                {"\u00A9"} FidelPE Asmara 2023 - {new Date().getFullYear()}.
+              </p>
+              <p className="flex items-center justify-center gap-1 text-gray-400">
+                Made with
+                <svg
+                  className="w-3.5 h-3.5 text-red-500 fill-current"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+                and code
+              </p>
+            </div>
+          </>
+        )}
       </aside>
     </>
   );

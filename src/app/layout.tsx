@@ -15,14 +15,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`scroll-smooth`} suppressHydrationWarning>
       <body className="w-full min-h-screen bg-linear-to-br from-gray-900 to-gray-800">
-        <div className="flex min-h-screen w-full backdrop-blur-sm/0">
-          <Sidebar />
-          <section className="flex-1 min-h-screen p-1 sm:p-4 md:p-6">
-            <div className="w-full h-full rounded-2xl p-3 sm:p-4 md:p-6">
-              <EmailGate>{children}</EmailGate>
-            </div>
-          </section>
-        </div>
+        <EmailGate>
+          <div className="flex min-h-screen w-full backdrop-blur-sm/0">
+            <Sidebar />
+            <section className="flex-1 min-h-screen p-1 sm:p-4 md:p-6">
+              <div className="w-full h-full rounded-2xl p-3 sm:p-4 md:p-6">
+                {children}
+              </div>
+            </section>
+          </div>
+        </EmailGate>
       </body>
     </html>
   );

@@ -7,6 +7,7 @@ const STORAGE_KEY = "fidelpe.email";
 const DEFAULT_ERROR_MESSAGE =
   "We could not process your request. Please try again.";
 const APP_TITLE = "\u134A\u12F0\u120D\u1350 \u121D\u1235 \u130D\u12A5\u12DD";
+const STORAGE_TTL_SECONDS = 60 * 60 * 24 * 365;
 
 const extractErrorMessage = async (
   response: Response
@@ -23,6 +24,32 @@ const extractErrorMessage = async (
   return match?.[1] ?? null;
 };
 
+const isValidEmail = (value: string): boolean =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+const getCookieEmail = (): string => {
+  const escapedKey = STORAGE_KEY.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const pattern = new RegExp(`(?:^|;\\s*)${escapedKey}=([^;]*)`);
+  const match = pattern.exec(document.cookie);
+  if (!match?.[1]) {
+    return "";
+  }
+  try {
+    return decodeURIComponent(match[1]).trim();
+  } catch {
+    return "";
+  }
+};
+
+const removeCookieEmail = (): void => {
+  document.cookie = `${STORAGE_KEY}=; Max-Age=0; Path=/; SameSite=Lax`;
+};
+
+const persistEmail = (email: string): void => {
+  window.localStorage.setItem(STORAGE_KEY, email);
+  document.cookie = `${STORAGE_KEY}=${encodeURIComponent(email)}; Max-Age=${STORAGE_TTL_SECONDS}; Path=/; SameSite=Lax`;
+};
+
 type EmailGateProps = {
   children: React.ReactNode;
 };
@@ -37,10 +64,30 @@ export default function EmailGate({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedEmail = window.localStorage.getItem(STORAGE_KEY);
-    if (savedEmail?.trim()) {
-      setHasEmail(true);
+    let savedEmail = "";
+
+    try {
+      savedEmail = window.localStorage.getItem(STORAGE_KEY)?.trim() ?? "";
+    } catch {
+      savedEmail = "";
     }
+
+    if (!savedEmail) {
+      savedEmail = getCookieEmail();
+    }
+
+    if (savedEmail && isValidEmail(savedEmail)) {
+      setHasEmail(true);
+      setEmail(savedEmail);
+    } else {
+      try {
+        window.localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        // Ignore storage unavailability and continue with modal flow.
+      }
+      removeCookieEmail();
+    }
+
     setChecked(true);
   }, []);
 
@@ -59,7 +106,7 @@ export default function EmailGate({
 
   const isValid = useMemo(() => {
     const trimmed = email.trim();
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
+    return isValidEmail(trimmed);
   }, [email]);
 
   const handleSubmit = useCallback(
@@ -85,7 +132,7 @@ export default function EmailGate({
             throw new Error(message);
           }
 
-          window.localStorage.setItem(STORAGE_KEY, trimmed);
+          persistEmail(trimmed);
           setHasEmail(true);
         })
         .catch((err: Error) => {
